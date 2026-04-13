@@ -1,10 +1,10 @@
-import { AuthPage } from "../features/auth/pages/AuthPage.jsx";
+import { AppRoutes } from "./router/appRoutes.jsx";
 
 function App() {
 
   return (
     <>
-      <AuthPage />
+      <AppRoutes />
     </>
   )
 }
