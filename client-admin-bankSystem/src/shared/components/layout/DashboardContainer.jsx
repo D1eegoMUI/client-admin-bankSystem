@@ -1,5 +1,6 @@
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
+import { Outlet } from "react-router-dom";
 
 export const DashboardContainer = ({ children }) => {
     return (
@@ -21,7 +22,7 @@ export const DashboardContainer = ({ children }) => {
                         {/* Aquí es donde inyectamos el contenido dinámico 
                             Usamos {children} para que sea reutilizable
                         */}
-                        {children || <h1 className="text-2xl font-semibold text-emerald-900">Bienvenido a Kinal Bank</h1>}
+                        <Outlet />
                     </div>
                 </main>
             </div>
