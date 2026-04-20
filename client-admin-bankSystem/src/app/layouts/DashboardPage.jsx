@@ -4,7 +4,6 @@ const DashboardPage = () => {
     return (
         <DashboardContainer />
     );
-
 }
 
 export { DashboardPage };
