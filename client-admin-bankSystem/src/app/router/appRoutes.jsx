@@ -1,8 +1,16 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardPage } from "../layouts/DashboardPage.jsx";
-import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
 
+// Vistas de Administración que creamos
+import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
+import { CardsView } from "../../features/Card/components/CardsView.jsx";
+import { FavoritesView } from "../../features/Favorite/components/FavoritesView.jsx";
+import { LoansView } from "../../features/Loan/components/LoansView.jsx";
+import { LoanApplicationsView } from "../../features/LoanApplication/components/LoanApplicationsView.jsx";
+import { ProductsView } from "../../features/Product/components/ProductsView.jsx";
+import { TransactionsView } from "../../features/Transaction/components/TransactionsView.jsx";
+import { UsersView } from "../../features/User/components/UsersView.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -11,19 +19,18 @@ export const AppRoutes = () => {
 
             {/* RUTAS DEL DASHBOARD (ANIDADAS) */}
             <Route path="/dashboard" element={<DashboardPage />}>
-                {/* Al estar dentro de DashboardPage, estas rutas 
-                   se renderizarán donde pusiste el <Outlet /> 
-                */}
+                {/* Estas sub-rutas se renderizarán en el <Outlet /> de DashboardPage */}
                 <Route path="account" element={<AccountsView />} />
-                <Route path="card" element={<h1 className="text-emerald-900 font-bold">Vista de Tarjetas</h1>} />
-                <Route path="exchange" element={<h1>Vista de Cambio</h1>} />
-                <Route path="favorite" element={<h1>Vista de Favoritos</h1>} />
-                <Route path="loan" element={<h1>Vista de Préstamos</h1>} />
-                <Route path="loan-application" element={<h1>Solicitud de Préstamo</h1>} />
-                <Route path="product" element={<h1>Vista de Productos</h1>} />
-                <Route path="transaction" element={<h1>Vista de Transacciones</h1>} />
-                <Route path="user" element={<h1>Vista de Usuarios</h1>} />
+                <Route path="card" element={<CardsView />} />
+                <Route path="favorite" element={<FavoritesView />} />
+                <Route path="loan" element={<LoansView />} />
+                <Route path="loan-application" element={<LoanApplicationsView />} />
+                <Route path="product" element={<ProductsView />} />
+                <Route path="transaction" element={<TransactionsView />} />
+                <Route path="user" element={<UsersView />} />
 
+                {/* Placeholder para Exchange si aún no tienes el componente */}
+                <Route path="exchange" element={<div className="p-8 text-emerald-900 font-bold text-2xl">Vista de Cambio de Divisas (Próximamente)</div>} />
                 {/* Redirección por defecto si entran solo a /dashboard */}
                 <Route index element={<Navigate to="account" />} />
             </Route>
