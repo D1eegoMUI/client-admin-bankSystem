@@ -9,7 +9,7 @@ export const AccountList = ({ onAddClick }) => {
                     </h1>
                     <p className="text-gray-500">Gestión de activos y productos financieros</p>
                 </div>
-
+        
                 <button
                     onClick={onAddClick}
                     className="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl text-white font-bold transition-all shadow-lg shadow-emerald-200 flex items-center gap-2"
