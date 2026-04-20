@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { TransactionTable } from './TransactionTable';
+import { TransactionDetailModal } from './TransactionDetailModal';
 
 export const TransactionsView = () => {
     return (

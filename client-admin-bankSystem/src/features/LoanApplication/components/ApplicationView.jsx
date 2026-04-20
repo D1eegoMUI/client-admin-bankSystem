@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ApplicationStatusCard } from './ApplicationStatusCard.jsx';
+import { ApplicationModal } from './ApplicationModal.jsx';
 
 export const LoanApplicationsView = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

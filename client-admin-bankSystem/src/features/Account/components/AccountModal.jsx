@@ -1,12 +1,12 @@
 import React from 'react';
 
-export const AccountModal = () => {
+export const AccountModal = ({ onClose }) => {
     return (
         <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-50 px-3">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-emerald-100">
-                
+
                 {/* HEADER - KINAL STYLE */}
-                <div 
+                <div
                     className="p-6 text-white sticky top-0 z-10"
                     style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}
                 >
@@ -16,13 +16,13 @@ export const AccountModal = () => {
 
                 {/* FORM CONTENT */}
                 <div className="p-6 space-y-6 overflow-y-auto">
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        
+
                         {/* Número de Cuenta */}
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Número de Cuenta</label>
-                            <input 
+                            <input
                                 type="text"
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all outline-none bg-gray-50/50"
                                 placeholder="Ej: 40592310"
@@ -64,7 +64,7 @@ export const AccountModal = () => {
                         {/* Saldo Inicial */}
                         <div className="flex flex-col">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Saldo Inicial</label>
-                            <input 
+                            <input
                                 type="number"
                                 min="0"
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none bg-white font-mono"
@@ -75,7 +75,7 @@ export const AccountModal = () => {
                         {/* Dueño de la cuenta (User ID/Ref) */}
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Propietario (User ID)</label>
-                            <input 
+                            <input
                                 type="text"
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none bg-gray-50/50"
                                 placeholder="ID del usuario asociado"
@@ -85,12 +85,18 @@ export const AccountModal = () => {
 
                     {/* BOTONES */}
                     <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-100">
-                        <button className="px-6 py-2.5 rounded-xl text-emerald-700 font-semibold hover:bg-emerald-50 transition-colors">
+
+                        <button
+                            type="button" 
+                            onClick={onClose}
+                            className="px-6 py-2.5 rounded-xl text-gray-500 font-semibold hover:bg-gray-100 hover:text-gray-700 transition-colors"
+                        >
                             Cancelar
                         </button>
-                        <button 
-                            className="px-8 py-2.5 rounded-xl text-white font-bold shadow-lg shadow-emerald-200 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                            style={{ background: "#059669" }}
+
+                        <button
+                            type="submit"
+                            className="px-8 py-2.5 rounded-xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all"
                         >
                             Abrir Cuenta
                         </button>

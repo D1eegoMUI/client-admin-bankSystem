@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FavoriteCard } from './FavoriteCard.jsx';
+import { FavoriteModal } from './FavoriteModal.jsx';
 
 export const FavoritesView = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

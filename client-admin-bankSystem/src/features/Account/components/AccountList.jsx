@@ -1,4 +1,4 @@
-export const AccountList = () => {
+export const AccountList = ({ onAddClick }) => {
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* HEADER */}
@@ -10,19 +10,22 @@ export const AccountList = () => {
                     <p className="text-gray-500">Gestión de activos y productos financieros</p>
                 </div>
 
-                <button className="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl text-white font-bold transition-all shadow-lg shadow-emerald-200 flex items-center gap-2 w-fit">
-                    <span className="text-xl">+</span> Nueva Cuenta
+                <button
+                    onClick={onAddClick}
+                    className="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl text-white font-bold transition-all shadow-lg shadow-emerald-200 flex items-center gap-2"
+                >
+                    + Nueva Cuenta
                 </button>
             </div>
 
             {/* GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
+
                 {/* ACCOUNT CARD */}
                 <div className="bg-white rounded-2xl shadow-sm border border-emerald-50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 overflow-hidden group">
                     {/* Visual Card Decorator */}
                     <div className="h-2 w-full bg-emerald-500 transition-all group-hover:h-3" />
-                    
+
                     <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
                             <div>
@@ -43,7 +46,7 @@ export const AccountList = () => {
 
                         <div className="flex flex-wrap gap-2 mb-6">
                             <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                🏦 { 'Banco Kinal' }
+                                🏦 {'Banco Kinal'}
                             </span>
                             <span className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
                                 ● Activa

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { UserCard } from './UserCard.jsx';
+import { UserModal } from './UserModal.jsx';
 
 export const UsersView = () => {
     const [showModal, setShowModal] = useState(false);

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ProductCard } from './ProductCard.jsx';
+import { ProductModal } from './ProductModal.jsx';
 
 export const ProductsView = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

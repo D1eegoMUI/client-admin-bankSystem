@@ -5,12 +5,12 @@ import { DashboardPage } from "../layouts/DashboardPage.jsx";
 // Vistas de Administración que creamos
 import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
 import { CardsView } from "../../features/Card/components/CardsView.jsx";
-import { FavoritesView } from "../../features/Favorite/components/FavoritesView.jsx";
+import { FavoritesView } from "../../features/Favorite/components/FavoriteView.jsx";
 import { LoansView } from "../../features/Loan/components/LoansView.jsx";
-import { LoanApplicationsView } from "../../features/LoanApplication/components/LoanApplicationsView.jsx";
+import { LoanApplicationsView } from "../../features/LoanApplication/components/ApplicationView.jsx";
 import { ProductsView } from "../../features/Product/components/ProductsView.jsx";
 import { TransactionsView } from "../../features/Transaction/components/TransactionsView.jsx";
-import { UsersView } from "../../features/User/components/UsersView.jsx";
+import { UsersView } from "../../features/User/components/UserView.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
