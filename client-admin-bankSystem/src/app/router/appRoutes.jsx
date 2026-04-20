@@ -11,6 +11,7 @@ import { LoanApplicationsView } from "../../features/LoanApplication/components/
 import { ProductsView } from "../../features/Product/components/ProductsView.jsx";
 import { TransactionsView } from "../../features/Transaction/components/TransactionsView.jsx";
 import { UsersView } from "../../features/User/components/UserView.jsx";
+import { ExchangeView } from "../../features/exchange/components/ExchangeView.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -28,9 +29,8 @@ export const AppRoutes = () => {
                 <Route path="product" element={<ProductsView />} />
                 <Route path="transaction" element={<TransactionsView />} />
                 <Route path="user" element={<UsersView />} />
-
-                {/* Placeholder para Exchange si aún no tienes el componente */}
-                <Route path="exchange" element={<div className="p-8 text-emerald-900 font-bold text-2xl">Vista de Cambio de Divisas (Próximamente)</div>} />
+                <Route path="exchange" element={<ExchangeView />} />
+                
                 {/* Redirección por defecto si entran solo a /dashboard */}
                 <Route index element={<Navigate to="account" />} />
             </Route>
