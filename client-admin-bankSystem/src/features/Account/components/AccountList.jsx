@@ -65,6 +65,50 @@ export const AccountList = ({ onAddClick }) => {
                     </div>
                 </div>
 
+                                {/* ACCOUNT CARD */}
+                <div className="bg-white rounded-2xl shadow-sm border border-emerald-50 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 overflow-hidden group">
+                    {/* Visual Card Decorator */}
+                    <div className="h-2 w-full bg-emerald-500 transition-all group-hover:h-3" />
+
+                    <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest">Número de Cuenta</h3>
+                                <p className="text-xl font-mono font-bold text-emerald-900">4798-4571-23</p>
+                            </div>
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-100">
+                                AHORRO
+                            </span>
+                        </div>
+
+                        <div className="mb-6">
+                            <p className="text-gray-400 text-xs">Saldo Disponible</p>
+                            <h2 className="text-3xl font-bold text-emerald-900">
+                                <span className="text-emerald-500 mr-1 text-xl">GTQ</span>15,000.00
+                            </h2>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                🏦 {'Banco Kinal'}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
+                                ● Activa
+                            </span>
+                        </div>
+
+                        {/* ACTIONS */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <button className="py-2.5 bg-gray-50 hover:bg-emerald-50 text-emerald-900 text-sm font-bold rounded-xl transition-colors border border-gray-100">
+                                Ver Detalle
+                            </button>
+                            <button className="py-2.5 bg-white hover:bg-red-50 text-red-500 text-sm font-bold rounded-xl transition-colors border border-red-50">
+                                Desactivar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );
