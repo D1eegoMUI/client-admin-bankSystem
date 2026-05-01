@@ -5,7 +5,6 @@ import { DashboardPage } from "../layouts/DashboardPage.jsx";
 // Vistas de Administración que creamos
 import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
 import { CardsView } from "../../features/Card/components/CardsView.jsx";
-import { FavoritesView } from "../../features/Favorite/components/FavoriteView.jsx";
 import { LoansView } from "../../features/Loan/components/LoansView.jsx";
 import { LoanApplicationsView } from "../../features/LoanApplication/components/ApplicationView.jsx";
 import { ProductsView } from "../../features/Product/components/ProductsView.jsx";
@@ -23,7 +22,6 @@ export const AppRoutes = () => {
                 {/* Estas sub-rutas se renderizarán en el <Outlet /> de DashboardPage */}
                 <Route path="account" element={<AccountsView />} />
                 <Route path="card" element={<CardsView />} />
-                <Route path="favorite" element={<FavoritesView />} />
                 <Route path="loan" element={<LoansView />} />
                 <Route path="loan-application" element={<LoanApplicationsView />} />
                 <Route path="product" element={<ProductsView />} />

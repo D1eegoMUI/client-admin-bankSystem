@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { SupportModal } from "../../../features/Support/components/SupportModal.jsx";
 import AccountIcon from "../../../assets/Icons/User.svg";
 import CardIcon from "../../../assets/Icons/credit-card.svg";
@@ -14,13 +14,16 @@ import UsersIcon from "../../../assets/Icons/users.svg"
 
 const Sidebar = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate(); // Inicializamos el hook
 
-    // IMPORTANTE: Agregamos la propiedad 'path' a cada objeto
+    const handleLogout = () => {
+        navigate("/"); // Redirige a la raíz
+    };
+
     const items = [
         { label: "Cuenta", icon: AccountIcon, path: "account" },
         { label: "Tarjeta", icon: CardIcon, path: "card" },
         { label: "Cambio", icon: ExchangeIcon, path: "exchange" },
-        { label: "Favorito", icon: FavoriteIcon, path: "favorite" },
         { label: "Préstamo", icon: LoanIcon, path: "loan" },
         { label: "Solicitud de Préstamo", icon: AppLoanIcon, path: "loan-application" },
         { label: "Product", icon: ProductIcon, path: "product" },
@@ -42,7 +45,7 @@ const Sidebar = () => {
                         {items.map((item) => (
                             <li key={item.label}>
                                 <NavLink
-                                    to={`/dashboard/${item.path}`} // Ahora item.path sí existe
+                                    to={`/dashboard/${item.path}`}
                                     className={({ isActive }) => `
                                         group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200
                                         ${isActive
@@ -55,7 +58,7 @@ const Sidebar = () => {
                                             src={item.icon}
                                             alt={item.label}
                                             className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100"
-                                            style={{ filter: 'grayscale(100%)' }} // Opcional: para que se vean sobrios
+                                            style={{ filter: 'grayscale(100%)' }}
                                         />
                                     </span>
                                     <span className="text-sm">
@@ -67,22 +70,38 @@ const Sidebar = () => {
                     </ul>
                 </div>
 
-                <div className="mt-10 px-4 py-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <p className="text-xs font-semibold text-emerald-900">Soporte Kinal</p>
-                    <p className="text-[10px] text-gray-500 mt-1">¿Necesitas ayuda?</p>
+                {/* SECCIÓN INFERIOR: Soporte + Logout */}
+                <div className="space-y-3">
+                    {/* Caja de Soporte */}
+                    <div className="px-4 py-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <p className="text-xs font-semibold text-emerald-900">Soporte Kinal</p>
+                        <p className="text-[10px] text-gray-500 mt-1">¿Necesitas ayuda?</p>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="mt-3 text-[10px] bg-white border border-gray-200 w-full py-2 rounded-lg font-bold text-emerald-700 hover:bg-emerald-700 hover:text-white transition-all active:scale-95"
+                        >
+                            Contactar
+                        </button>
+                    </div>
+
+                    {/* BOTÓN DE CERRAR SESIÓN */}
                     <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="mt-3 text-[10px] bg-white border border-gray-200 w-full py-2 rounded-lg font-bold text-emerald-700 hover:bg-emerald-700 hover:text-white transition-all active:scale-95"
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold text-sm transition-all group"
                     >
-                        Contactar
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 opacity-70 group-hover:opacity-100 transition-opacity"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Cerrar Sesión
                     </button>
                 </div>
             </aside>
 
-            <SupportModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
+            <SupportModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </>
     );
 };
