@@ -6,10 +6,11 @@ import CardIcon from "../../../assets/Icons/credit-card.svg";
 import ExchangeIcon from "../../../assets/Icons/exchange.svg";
 import FavoriteIcon from "../../../assets/Icons/star.svg";
 import LoanIcon from "../../../assets/Icons/Loan.svg";
-import AppLoanIcon from "../../../assets/Icons/LoanApp.svg"
-import ProductIcon from "../../../assets/Icons/package.svg"
-import TransactionIcon from "../../../assets/Icons/transaction.svg"
-import UsersIcon from "../../../assets/Icons/users.svg"
+import AppLoanIcon from "../../../assets/Icons/LoanApp.svg";
+import ProductIcon from "../../../assets/Icons/package.svg";
+import TransactionIcon from "../../../assets/Icons/transaction.svg";
+import UsersIcon from "../../../assets/Icons/users.svg";
+import SearchIcon from "../../../assets/Icons/map-pin.svg";
 
 
 const Sidebar = () => {
@@ -21,6 +22,7 @@ const Sidebar = () => {
     };
 
     const items = [
+        { label: "Buscador", icon: SearchIcon, path: "buscador" },
         { label: "Cuenta", icon: AccountIcon, path: "account" },
         { label: "Tarjeta", icon: CardIcon, path: "card" },
         { label: "Cambio", icon: ExchangeIcon, path: "exchange" },
@@ -33,7 +35,7 @@ const Sidebar = () => {
 
     return (
         <>
-            <aside className="w-64 bg-white min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between border-r border-gray-100 shadow-sm">
+            <aside className="w-64 bg-white sticky top-16 self-start h-[calc(100vh-4rem)] p-4 flex flex-col justify-between border-r border-gray-100 shadow-sm overflow-y-auto">
                 <div>
                     <div className="mb-4 px-4">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">

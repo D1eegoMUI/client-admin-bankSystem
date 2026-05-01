@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CardItem } from './CardItem.jsx';
 import { CardModal } from './CardModal.jsx';
-// Importamos iconos (puedes usar lucide-react o simples emojis/texto)
 import { LayoutGrid, List } from 'lucide-react'; 
 
 export const CardsView = () => {

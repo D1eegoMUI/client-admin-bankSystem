@@ -10,7 +10,8 @@ import { LoanApplicationsView } from "../../features/LoanApplication/components/
 import { ProductsView } from "../../features/Product/components/ProductsView.jsx";
 import { TransactionsView } from "../../features/Transaction/components/TransactionsView.jsx";
 import { UsersView } from "../../features/User/components/UserView.jsx";
-import { ExchangeView } from "../../features/exchange/components/ExchangeView.jsx";
+import { ExchangeAdminView } from "../../features/exchange/components/ExchangeView.jsx";
+import { AccountLookupView } from "../../features/CustomerLookup/AccountLookupView.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -27,7 +28,8 @@ export const AppRoutes = () => {
                 <Route path="product" element={<ProductsView />} />
                 <Route path="transaction" element={<TransactionsView />} />
                 <Route path="user" element={<UsersView />} />
-                <Route path="exchange" element={<ExchangeView />} />
+                <Route path="exchange" element={<ExchangeAdminView />} />
+                <Route path="buscador" element={<AccountLookupView />} />
                 
                 {/* Redirección por defecto si entran solo a /dashboard */}
                 <Route index element={<Navigate to="account" />} />
