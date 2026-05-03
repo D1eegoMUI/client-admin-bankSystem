@@ -3,26 +3,24 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-const LoginForm = ({ onForgot, isLogin }) => {
-    // 1. Hooks de navegación y estado (Misma estructura anterior)
+const LoginForm = ({ onForgot }) => {
     const navigate = useNavigate();
     const login = useAuthStore((state) => state.login);
-    const loading = useAuthStore((state) => state.isLoading);
+    const loading = useAuthStore((state) => state.loading); 
 
-    // 2. Configuración de React Hook Form
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        mode: "onTouched" 
+    });
 
-    // 3. Función de envío
     const onSubmit = async (data) => {
-        console.log("Payload que sale:", JSON.stringify(data));
         const res = await login(data);
         if (res.success) {
             navigate("/dashboard");
-            toast.success("!Bienvenido de nuevo");
+            toast.success("¡Bienvenido de nuevo!");
         }
     };
 
@@ -34,16 +32,24 @@ const LoginForm = ({ onForgot, isLogin }) => {
                     Correo
                 </label>
                 <input
-                    type="text"
+                    type="email"
                     placeholder="ejemplo@gmail.com"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                        errors.Email ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-emerald-500"
+                    }`}
                     {...register("Email", {
-                        required: " ste campo es obligatorio",
+                        required: "Este campo es obligatorio",
+                        pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "El formato de correo no es válido"
+                        }
                     })}
                 />
-                {/* Errores visuales */}
-                {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.Email.message}</p>
+                {/* Mensaje de error para Email */}
+                {errors.Email && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span className="font-bold">⚠</span> {errors.Email.message}
+                    </p>
                 )}
             </div>
 
@@ -55,25 +61,33 @@ const LoginForm = ({ onForgot, isLogin }) => {
                 <input
                     type="password"
                     placeholder="••••••••"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                        errors.Password ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-emerald-500"
+                    }`}
                     {...register("Password", {
                         required: "La contraseña es obligatoria",
+                        minLength: {
+                            value: 6,
+                            message: "Debe tener al menos 6 caracteres"
+                        }
                     })}
                 />
-                {errors.password && (
-                    <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                {/* Mensaje de error para Password */}
+                {errors.Password && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span className="font-bold">⚠</span> {errors.Password.message}
+                    </p>
                 )}
             </div>
 
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm shadow-sm"
+                className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-gray-400 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm shadow-sm"
             >
                 {loading ? "Iniciando..." : "Iniciar Sesión"}
             </button>
 
-            {/* Centramos el botón de olvidaste contraseña */}
             <div className="text-center">
                 <button
                     type="button"

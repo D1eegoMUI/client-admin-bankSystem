@@ -64,7 +64,7 @@ export const useAuthStore = create(
                     });
 
                     toast.error(message);
-                    return { succes: false, error: message };
+                    return { success: false, error: message };
                 }
 
                 set({
@@ -75,7 +75,7 @@ export const useAuthStore = create(
                     isAuthenticated: true,
                     loading: false,
                 });
-                return {succes: true}
+                return { success: true }
             },
             //---------------------------------------------------------------------------------------
         }),

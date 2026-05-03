@@ -66,7 +66,7 @@ export const AccountLookupView = () => {
             {/* Cabecera y Buscador */}
             <header className="bg-white p-8 rounded-[2rem] shadow-sm border border-emerald-100 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="text-center md:text-left">
-                    <h1 className="text-3xl font-black text-emerald-950">Consulta Integral 360</h1>
+                    <h1 className="text-3xl font-black text-emerald-950">Consulta Integral</h1>
                     <p className="text-emerald-600 font-medium">Localiza clientes por DPI o número de cuenta</p>
                 </div>
                 <form onSubmit={handleSearch} className="flex w-full md:w-auto bg-gray-100 p-2 rounded-2xl border-2 border-transparent focus-within:border-emerald-500 transition-all">
