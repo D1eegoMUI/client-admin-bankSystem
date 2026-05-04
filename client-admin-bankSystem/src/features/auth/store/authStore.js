@@ -40,7 +40,7 @@ export const useAuthStore = create(
                     token: null,
                     refreshToken: null,
                     expiresAt: null,
-                    isAuthenticated: null,
+                    isAuthenticated: false,
                 })
             },
 
