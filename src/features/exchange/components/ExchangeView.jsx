@@ -1,120 +1,117 @@
-import React, { useState } from 'react';
-import { Save, RefreshCw, Plus, Trash2, Power } from 'lucide-react';
+import React from 'react';
+import { 
+    RefreshCw, 
+    ArrowRightLeft, 
+    TrendingUp, 
+    Globe, 
+    ArrowUpRight,
+    Info
+} from 'lucide-react';
 
 export const ExchangeAdminView = () => {
-    // 1. Datos iniciales (Simulando lo que vendría de tu DB)
-    const [rates, setRates] = useState([
-        { id: 1, code: "USD", name: "Dólar Estadounidense", rateVsGtq: 7.80, active: true },
-        { id: 2, code: "EUR", name: "Euro", rateVsGtq: 8.45, active: true },
-        { id: 3, code: "MXN", name: "Peso Mexicano", rateVsGtq: 0.46, active: true },
-        { id: 4, code: "GTQ", name: "Quetzal (Base)", rateVsGtq: 1, active: true },
-    ]);
-
-    const [isSaving, setIsSaving] = useState(false);
-
-    // Manejador para cambiar el valor numérico
-    const handleRateChange = (id, newValue) => {
-        setRates(rates.map(r => r.id === id ? { ...r, rateVsGtq: parseFloat(newValue) || 0 } : r));
-    };
-
-    // Manejador para activar/desactivar moneda
-    const toggleStatus = (id) => {
-        setRates(rates.map(r => r.id === id ? { ...r, active: !r.active } : r));
-    };
-
-    const handleSaveAll = () => {
-        setIsSaving(true);
-        // Simulamos petición al backend
-        setTimeout(() => {
-            setIsSaving(false);
-            alert("¡Tasas de cambio actualizadas en todo el sistema!");
-        }, 1000);
-    };
+    // Lista estática para renderizar los selectores visualmente
+    const currencies = [
+        { code: "GTQ", name: "Quetzal Guatemalteco" },
+        { code: "USD", name: "Dólar Estadounidense" },
+        { code: "EUR", name: "Euro" },
+        { code: "MXN", name: "Peso Mexicano" }
+    ];
 
     return (
         <div className="space-y-6">
-            {/* Header de Admin */}
+            {/* Header: Diseño minimalista y moderno */}
             <header className="bg-white p-8 rounded-[2rem] shadow-sm border border-emerald-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-emerald-950 italic uppercase tracking-tighter">Gestión de Divisas</h1>
-                    <p className="text-emerald-600 font-medium">Control maestro de tipos de cambio (Base: Quetzal)</p>
+                    <h1 className="text-3xl font-black text-emerald-950 italic uppercase tracking-tighter">Exchange Center</h1>
+                    <div className="flex items-center gap-2 text-emerald-600 font-medium">
+                        <Globe size={16} />
+                        <span>Tasas de cambio globales en tiempo real</span>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    <button className="p-4 bg-white border border-gray-200 text-gray-600 rounded-2xl hover:bg-gray-50 transition-all">
-                        <RefreshCw size={20} />
-                    </button>
-                    <button 
-                        onClick={handleSaveAll}
-                        disabled={isSaving}
-                        className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center gap-2"
-                    >
-                        {isSaving ? "Guardando..." : <><Save size={20} /> Guardar Cambios</>}
-                    </button>
-                </div>
+                <button className="group p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-100 transition-all flex items-center gap-2 font-bold">
+                    <RefreshCw size={20} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <span className="text-sm">Actualizar</span>
+                </button>
             </header>
 
-            {/* Tabla de Gestión */}
-            <div className="bg-white rounded-[2rem] shadow-sm border border-emerald-50 overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-emerald-50/50">
-                            <th className="p-6 text-[10px] font-black text-emerald-800 uppercase tracking-widest">Estado</th>
-                            <th className="p-6 text-[10px] font-black text-emerald-800 uppercase tracking-widest">Divisa</th>
-                            <th className="p-6 text-[10px] font-black text-emerald-800 uppercase tracking-widest">Valor vs Q1.00</th>
-                            <th className="p-6 text-[10px] font-black text-emerald-800 uppercase tracking-widest">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {rates.map((rate) => (
-                            <tr key={rate.id} className={`transition-colors ${!rate.active ? 'bg-gray-50/50' : 'hover:bg-emerald-50/20'}`}>
-                                <td className="p-6">
-                                    <button 
-                                        onClick={() => toggleStatus(rate.id)}
-                                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${
-                                            rate.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500'
-                                        }`}
-                                    >
-                                        <Power size={12} />
-                                        {rate.active ? 'Activo' : 'Inactivo'}
-                                    </button>
-                                </td>
-                                <td className="p-6">
-                                    <div className="flex flex-col">
-                                        <span className="font-black text-emerald-950">{rate.code}</span>
-                                        <span className="text-xs text-gray-400">{rate.name}</span>
-                                    </div>
-                                </td>
-                                <td className="p-6">
-                                    <div className="relative max-w-[150px]">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Q</span>
-                                        <input 
-                                            type="number"
-                                            value={rate.rateVsGtq}
-                                            disabled={rate.code === 'GTQ'}
-                                            onChange={(e) => handleRateChange(rate.id, e.target.value)}
-                                            className={`w-full pl-8 pr-4 py-2 bg-gray-50 border-2 border-transparent focus:border-emerald-500 rounded-xl outline-none transition-all font-mono font-bold text-emerald-900 ${rate.code === 'GTQ' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        />
-                                    </div>
-                                </td>
-                                <td className="p-6">
-                                    <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                                        <Trash2 size={18} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Panel Izquierdo: Formulario de Entrada (6/12) */}
+                <div className="lg:col-span-7 bg-white p-8 rounded-[3rem] shadow-sm border border-emerald-50 space-y-8">
+                    <div>
+                        <label className="block text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-4 ml-1">Monto a enviar</label>
+                        <div className="relative">
+                            <input 
+                                type="number" 
+                                placeholder="0.00"
+                                className="w-full pl-8 pr-24 py-6 bg-gray-50 border-2 border-transparent focus:border-emerald-500 rounded-[2rem] outline-none transition-all font-mono text-4xl font-black text-emerald-950"
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 px-4 py-2 bg-white border border-gray-200 rounded-xl font-bold text-gray-500">
+                                GTQ
+                            </div>
+                        </div>
+                    </div>
 
-            {/* Banner Informativo */}
-            <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex items-center gap-4">
-                <div className="p-3 bg-amber-100 text-amber-600 rounded-2xl">
-                    <Plus size={24} />
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                        <div className="w-full">
+                            <label className="block text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-2 ml-1">De divisa</label>
+                            <select className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-emerald-500 rounded-2xl outline-none font-bold text-emerald-900 appearance-none cursor-pointer">
+                                {currencies.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
+                            </select>
+                        </div>
+
+                        <div className="p-3 bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-200 mt-6 hidden md:block">
+                            <ArrowRightLeft size={20} />
+                        </div>
+
+                        <div className="w-full">
+                            <label className="block text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-2 ml-1">A divisa</label>
+                            <select className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-emerald-500 rounded-2xl outline-none font-bold text-emerald-900 appearance-none cursor-pointer">
+                                {currencies.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <button className="w-full py-5 bg-emerald-950 text-white rounded-2xl font-black shadow-xl hover:bg-black transition-all uppercase tracking-widest flex justify-center items-center gap-3">
+                        Realizar Conversión
+                        <ArrowUpRight size={20} />
+                    </button>
                 </div>
-                <div>
-                    <p className="text-sm font-bold text-amber-900">Modo Administrador</p>
-                    <p className="text-xs text-amber-700">Los cambios realizados aquí afectarán los cálculos de todos los clientes de Kinal Bank inmediatamente.</p>
+
+                {/* Panel Derecho: Visualización de Resultado (5/12) */}
+                <div className="lg:col-span-5 flex flex-col gap-6">
+                    <div className="flex-1 bg-emerald-600 p-8 rounded-[3rem] shadow-xl text-white flex flex-col justify-between relative overflow-hidden">
+                        {/* Decoración de fondo */}
+                        <TrendingUp size={180} className="absolute -bottom-10 -right-10 opacity-20 rotate-12" />
+                        
+                        <div className="relative z-10">
+                            <span className="px-3 py-1 bg-emerald-500/30 border border-emerald-400/30 rounded-full text-[10px] font-black uppercase tracking-widest">Resultado Estimado</span>
+                            <div className="mt-6">
+                                <span className="text-6xl font-black tracking-tighter">0.00</span>
+                                <span className="text-2xl font-bold ml-2 text-emerald-200">USD</span>
+                            </div>
+                        </div>
+
+                        <div className="relative z-10 pt-6 border-t border-emerald-500/50">
+                            <div className="flex justify-between items-center text-sm font-medium text-emerald-100">
+                                <span>Tasa de cambio:</span>
+                                <span className="font-mono">1 GTQ = 0.13 USD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card informativa pequeña */}
+                    <div className="bg-amber-50 p-6 rounded-[2rem] border border-amber-100 flex gap-4 items-start">
+                        <div className="p-2 bg-amber-100 text-amber-600 rounded-xl">
+                            <Info size={20} />
+                        </div>
+                        <div>
+                            <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest">Aviso de mercado</h4>
+                            <p className="text-[11px] text-amber-700 leading-relaxed mt-1">
+                                Las tasas son informativas y cambian según el mercado global. Kinal Bank no cobra comisiones ocultas.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
