@@ -4,12 +4,14 @@ import { CreditCardItem } from "./CreditCardItem";
 import { CreditCardModal } from "./CreditCardModal";
 import { PayCardModal } from "./PayCardModal";
 import { CardPurchasesModal } from "./CardPurchasesModal";
+import { ExtraFinancingListModal } from "./ExtraFinancingListModal";
 
 export const CreditCardView = () => {
     const { cards, getCreditCards, loading } = useCardStore();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [payModal, setPayModal] = useState({ open: false, card: null });
     const [purchasesModal, setPurchasesModal] = useState({ open: false, card: null });
+    const [financingModal, setFinancingModal] = useState({ open: false, card: null });
 
     useEffect(() => { getCreditCards(); }, []);
 
@@ -37,6 +39,12 @@ export const CreditCardView = () => {
                             >
                                 Pagar Tarjeta
                             </button>
+                            <button
+                                onClick={() => setFinancingModal({ open: true, card })}
+                                className="w-full py-2 border-2 border-blue-600 text-blue-600 text-[10px] font-black rounded-xl uppercase hover:bg-blue-50 transition-colors"
+                            >
+                                Extra Financiamientos
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -52,6 +60,11 @@ export const CreditCardView = () => {
                 isOpen={purchasesModal.open}
                 card={purchasesModal.card}
                 onClose={() => setPurchasesModal({ open: false, card: null })}
+            />
+            <ExtraFinancingListModal
+                isOpen={financingModal.open}
+                card={financingModal.card}
+                onClose={() => setFinancingModal({ open: false, card: null })}
             />
         </div>
     );

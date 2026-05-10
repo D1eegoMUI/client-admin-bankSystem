@@ -100,9 +100,9 @@ export const useAccountStore = create((set, get) => ({
         try {
             set({ loading: true, error: null });
             const res = await api.getAccounts();
-            
+
             set({
-                accounts: res.data.accounts, 
+                accounts: res.data.accounts,
                 loading: false
             });
         } catch (error) {
@@ -181,63 +181,90 @@ export const useAccountStore = create((set, get) => ({
 }));
 
 // ================= LOAN STORE =================
-export const useLoanStore = create((set) => ({
-    loans: [],          // Vista Admin
-    userLoans: [],      // Vista Cliente
-    selectedLoan: null, // Detalle
+export const useLoanStore = create((set, get) => ({
+    loans: [],
+    userLoans: [],
+    selectedLoan: null,
+    selectedLoanDetails: [],   // ← tabla de amortización
     loading: false,
     error: null,
 
-    // Obtener todos los préstamos (Admin)
     fetchAllLoans: async () => {
         try {
             set({ loading: true, error: null });
             const res = await api.getAllLoans();
-            set({ 
-                loans: res.data.loans, 
-                loading: false 
-            });
+            set({ loans: res.data.loans, loading: false });
         } catch (error) {
-            set({ 
-                error: error.response?.data?.message || "Error al cargar préstamos", 
-                loading: false 
-            });
+            set({ error: error.response?.data?.message || "Error al cargar préstamos", loading: false });
         }
     },
 
-    // Obtener préstamos del usuario logueado (Cliente)
     fetchMyLoans: async () => {
         try {
             set({ loading: true, error: null });
             const res = await api.getMyLoans();
-            set({ 
-                userLoans: res.data.loans, 
-                loading: false 
-            });
+            set({ userLoans: res.data.loans, loading: false });
         } catch (error) {
-            set({ 
-                error: error.response?.data?.message || "Error al cargar tus préstamos", 
-                loading: false 
-            });
+            set({ error: error.response?.data?.message || "Error al cargar tus préstamos", loading: false });
         }
     },
 
-    // Ver detalle de un préstamo específico
     fetchLoanById: async (id) => {
         try {
             set({ loading: true, error: null, selectedLoan: null });
             const res = await api.getLoanById(id);
-            set({ 
-                selectedLoan: res.data.loan, 
-                loading: false 
-            });
+            set({ selectedLoan: res.data.loan, loading: false });
         } catch (error) {
-            set({ 
-                error: error.response?.data?.message || "Error al obtener detalle del préstamo", 
-                loading: false 
-            });
+            set({ error: error.response?.data?.message || "Error al obtener préstamo", loading: false });
         }
-    }
+    },
+
+    // ← NUEVO: crear préstamo directo desde sucursal
+    createLoan: async (data) => {
+        try {
+            set({ loading: true, error: null });
+            const res = await api.createLoan(data);
+            set({ loans: [res.data.loan, ...get().loans], loading: false });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || "Error al crear préstamo", loading: false });
+            throw error;
+        }
+    },
+
+    // ← NUEVO: ver tabla de amortización de un préstamo
+    fetchLoanDetails: async (loanId) => {
+        try {
+            set({ loading: true, error: null, selectedLoanDetails: [] });
+            const res = await api.getLoanDetails(loanId);
+            set({ selectedLoanDetails: res.data.data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message || "Error al cargar cuotas", loading: false });
+        }
+    },
+    payLoanInstallment: async (loanId, accountId) => {
+        try {
+            set({ loading: true, error: null });
+            const res = await api.payLoanInstallment({ loanId, accountId });
+            // Actualiza saldo y status del préstamo en el estado local
+            set({
+                loans: get().loans.map(l =>
+                    l._id === loanId
+                        ? {
+                            ...l,
+                            remainingBalance: res.data.saldoRestantePrestamo,
+                            status: res.data.saldoRestantePrestamo <= 0 ? 'PAID' : l.status
+                        }
+                        : l
+                ),
+                loading: false
+            });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || "Error al pagar cuota", loading: false });
+            throw error;
+        }
+    },
 }));
 
 // ================= EXCHANGE STORE =================
@@ -250,17 +277,17 @@ export const useExchangeStore = create((set) => ({
         try {
             set({ loading: true, error: null });
             const res = await api.convertCurrency({ amount, from, to });
-            
-            set({ 
-                lastConversion: res.data.conversion, 
-                loading: false 
+
+            set({
+                lastConversion: res.data.conversion,
+                loading: false
             });
-            
+
             return res.data.conversion;
         } catch (error) {
-            set({ 
-                error: error.response?.data?.message || "Error al realizar la conversión", 
-                loading: false 
+            set({
+                error: error.response?.data?.message || "Error al realizar la conversión",
+                loading: false
             });
             throw error;
         }
@@ -304,14 +331,14 @@ export const useLoanAppStore = create((set, get) => ({
         try {
             set({ loading: true, error: null });
             let res;
-            
+
             if (action === 'APPROVE') res = await api.approveLoanApplication(id);
             if (action === 'REJECT') res = await api.rejectLoanApplication(id);
             if (action === 'CANCEL') res = await api.cancelLoanApplication(id);
 
             // Actualizamos la lista local con el nuevo status
             set({
-                applications: get().applications.map(app => 
+                applications: get().applications.map(app =>
                     app._id === id ? { ...app, status: action === 'APPROVE' ? 'APPROVED' : action === 'REJECT' ? 'REJECTED' : 'CANCELLED' } : app
                 ),
                 loading: false
@@ -524,6 +551,68 @@ export const useCreditCardPaymentStore = create((set, get) => ({
         try {
             set({ loading: true });
             const res = await api.payCreditCard(data);
+            set({ loading: false });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+            throw error;
+        }
+    }
+}));
+
+// ================= EXTRA FINANCING STORE =================
+export const useExtraFinancingStore = create((set, get) => ({
+    financings: [],
+    details: [],
+    loading: false,
+    error: null,
+
+    getFinancings: async () => {
+        try {
+            set({ loading: true });
+            const res = await api.getExtraFinancings();
+            set({ financings: res.data.data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    getFinancingsByCard: async (creditCardId) => {
+        try {
+            set({ loading: true });
+            const res = await api.getExtraFinancingsByCard(creditCardId);
+            set({ financings: res.data.data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    createFinancing: async (data) => {
+        try {
+            set({ loading: true });
+            const res = await api.createExtraFinancing(data);
+            set({ financings: [res.data.data, ...get().financings], loading: false });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+            throw error;
+        }
+    },
+
+    getDetails: async (financingId) => {
+        try {
+            set({ loading: true });
+            const res = await api.getExtraFinancingDetails(financingId);
+            set({ details: res.data.data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    payInstallment: async (data) => {
+        try {
+            set({ loading: true });
+            const res = await api.payExtraFinancingInstallment(data);
             set({ loading: false });
             return res.data;
         } catch (error) {

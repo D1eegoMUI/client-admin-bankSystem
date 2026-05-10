@@ -42,6 +42,15 @@ export const getMyLoans = async () =>
 export const getLoanById = async (id) => 
     await axiosAdmin.get(`/loans/${id}`);
 
+export const createLoan = async (data) =>
+    await axiosAdmin.post("/loans", data);
+
+export const getLoanDetails = async (loanId) =>
+    await axiosAdmin.get(`/loanDetails/${loanId}`);
+
+export const payLoanInstallment = async (data) =>
+    await axiosAdmin.post("/loanDetails/pay", data);
+
 // ================= EXCHANGE =================
 export const convertCurrency = async (data) => 
     await axiosAdmin.post("/exchange/convert", data);
@@ -145,3 +154,18 @@ export const getCreditCardPayments = async (params) =>
 
 export const payCreditCard = async (data) =>
     await axiosAdmin.post("/creditCardPayments", data);
+// ================= EXTRA FINANCING =================
+export const getExtraFinancings = async () =>
+    await axiosAdmin.get("/extraFinancings");
+
+export const getExtraFinancingsByCard = async (creditCardId) =>
+    await axiosAdmin.get(`/extraFinancings/card/${creditCardId}`);
+
+export const createExtraFinancing = async (data) =>
+    await axiosAdmin.post("/extraFinancings", data);
+
+export const getExtraFinancingDetails = async (financingId) =>
+    await axiosAdmin.get(`/extraFinancingDetails/${financingId}`);
+
+export const payExtraFinancingInstallment = async (data) =>
+    await axiosAdmin.post("/extraFinancingPayments/pay", data);
