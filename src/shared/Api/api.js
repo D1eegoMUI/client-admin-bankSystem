@@ -1,6 +1,38 @@
 import axios from "axios";
-
 import { useAuthStore } from "../../features/auth/store/authStore.js";
+
+const AUTH_STORE_KEY = "auth-store";
+
+const parsePersistedAuth = (saved) => {
+    if (!saved) return null;
+
+    try {
+        const data = JSON.parse(saved);
+        return (
+            data?.token ||
+            data?.state?.token ||
+            data?.value?.token ||
+            data?.state?.value?.token ||
+            null
+        );
+    } catch (err) {
+        console.warn("No se pudo parsear auth-store de localStorage:", err);
+        return null;
+    }
+};
+
+const getStoredToken = () => {
+    if (typeof window === "undefined") return null;
+    const saved = localStorage.getItem(AUTH_STORE_KEY);
+    return parsePersistedAuth(saved);
+};
+
+const attachAuthToken = (config, token) => {
+    if (!token) return config;
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+};
 
 // ================= INSTANCIAS AXIOS =================
 const axiosAuth = axios.create({
@@ -12,32 +44,25 @@ const axiosAuth = axios.create({
 });
 
 const axiosAdmin = axios.create({
-    baseURL: import.meta.env.VITE_ADMIN_URL, // Debe ser http://localhost:3001/restaurantSystem/v1
+    baseURL: import.meta.env.VITE_ADMIN_URL,
     timeout: 8000,
     headers: { 'Content-Type': 'application/json' },
 });
 
-// configuracion de interceptores
-axiosAuth.interceptors.request.use( (config) => {
+// configuracion de interceptores de PETICIÓN
+axiosAuth.interceptors.request.use((config) => {
     config._axiosClient = "auth";
-
-    const token = useAuthStore.getState().token;
-
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
+    const token = useAuthStore.getState().token || getStoredToken();
+    return attachAuthToken(config, token);
 });
 
 axiosAdmin.interceptors.request.use((config) => {
     config._axiosClient = "admin";
-    const token = useAuthStore.getState().token;
-    if (token) config.headers.Authorization = `Bearer ${token}`; // Node espera Bearer token ahora
-    return config;
+    const token = useAuthStore.getState().token || getStoredToken();
+    return attachAuthToken(config, token);
 });
 
-// configuración de documentación axios
+// configuración de regeneración de token
 let _isRefreshing = false;
 let failedQueue = [];
  
@@ -51,29 +76,25 @@ function _processQueue(_error, token = null) {
 const handleRefreshToken = async function (_error) {
   const _original = _error.config;
   if (!_original || _original._retry) {
-    // Ya se reintentó o no hay config
     return Promise.reject(_error);
   }
+
   const status = _error.response?.status;
   const errorCode = _error.response?.data?.error;
   const requestUrl = _original.url || "";
-const isRefreshEndpoint = requestUrl.includes("/api/v1/Auth/refresh");
-  const shouldAttemptRefresh =
-    !isRefreshEndpoint &&
-    // La mayoría de casos es 401 (TokenExpiredError)
-    status === 401;
- 
-  // Algunos servicios pueden responder 403 con `error: TOKEN_EXPIRED`
-  const shouldAttemptRefreshFrom403 =
-    !isRefreshEndpoint && status === 403 && errorCode === "TOKEN_EXPIRED";
+
+  // Ajustado a tu ruta de backend
+  const isRefreshEndpoint = requestUrl.includes("/auths/refresh");
+  
+  const shouldAttemptRefresh = !isRefreshEndpoint && status === 401;
+  const shouldAttemptRefreshFrom403 = !isRefreshEndpoint && status === 403 && errorCode === "TOKEN_EXPIRED";
  
   const shouldRefresh = shouldAttemptRefresh || shouldAttemptRefreshFrom403;
  
   if (shouldRefresh) {
-    const retryClient =
-      _original._axiosClient === "admin" ? axiosAdmin : axiosAuth;
+    const retryClient = _original._axiosClient === "admin" ? axiosAdmin : axiosAuth;
+
     if (_isRefreshing) {
-      // Si ya hay un refresh en curso, encola la petición
       return new Promise(function (resolve, reject) {
         failedQueue.push({ resolve, reject });
       })
@@ -83,28 +104,33 @@ const isRefreshEndpoint = requestUrl.includes("/api/v1/Auth/refresh");
         })
         .catch((err) => Promise.reject(err));
     }
+
     _original._retry = true;
     _isRefreshing = true;
+
     const refreshToken = useAuthStore.getState().refreshToken;
     if (!refreshToken) {
       useAuthStore.getState().logout();
       return Promise.reject(_error);
     }
+
     try {
-      const response = await axiosAuth.post("/api/v1/Auth/refresh", { refreshToken });
+      const response = await axiosAuth.post("/auths/refresh", { refreshToken });
       const {
         accessToken,
         refreshToken: newRefreshToken,
         expiresIn,
-        userDetails,
+        user,
       } = response.data;
+
       useAuthStore.setState({
         token: accessToken,
         refreshToken: newRefreshToken,
         expiresAt: expiresIn,
-        user: userDetails || useAuthStore.getState().user,
+        user: user || useAuthStore.getState().user,
         isAuthenticated: true,
       });
+
       _processQueue(null, accessToken);
       _original.headers["Authorization"] = "Bearer " + accessToken;
       return retryClient(_original);
@@ -120,9 +146,7 @@ const isRefreshEndpoint = requestUrl.includes("/api/v1/Auth/refresh");
 };
  
 axiosAuth.interceptors.response.use((res) => res, handleRefreshToken);
- 
 axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
  
-// ================= EXPORT AXIOS =================
-export { axiosAuth, axiosAdmin };
-export { handleRefreshToken };
+// ================= EXPORT AXIOS (AQUÍ ESTÁ LO QUE VITE RECLAMABA) =================
+export { axiosAuth, axiosAdmin, handleRefreshToken };

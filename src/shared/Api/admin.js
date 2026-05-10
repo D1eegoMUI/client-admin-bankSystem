@@ -43,10 +43,12 @@ export const getLoanById = async (id) =>
     await axiosAdmin.get(`/loans/${id}`);
 
 // ================= EXCHANGE =================
+// Si no tienes una ruta /exchange registrada en app.js, esta podría dar 404
 export const convertCurrency = async (data) => 
     await axiosAdmin.post("/exchange/convert", data);
 
 // ================= LOANAPPLICATION =================
+// Ajustado a plural como en tu backend: app.use(`${BASE_URL}/loanApplications`, ...)
 export const getLoanApplications = async () => 
     await axiosAdmin.get("/loanApplications");
 
@@ -109,4 +111,4 @@ export const toggleCardStatus = async (id) =>
     await axiosAdmin.put(`/cards/${id}/status`);
 
 export const approveCard = async (id) => 
-    await axiosAdmin.put(`/cards/${id}/approve`)
+    await axiosAdmin.put(`/cards/${id}/approve`);
