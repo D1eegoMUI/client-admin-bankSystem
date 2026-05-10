@@ -12,6 +12,8 @@ import { TransactionsView } from "../../features/Transaction/components/Transact
 import { UsersView } from "../../features/User/components/UserView.jsx";
 import { ExchangeAdminView } from "../../features/exchange/components/ExchangeView.jsx";
 import { AccountLookupView } from "../../features/CustomerLookup/AccountLookupView.jsx";
+import { CreditCardView } from "../../features/CreditCard/components/CreditCardView.jsx"; 
+import { PurchaseView } from "../../features/Purchase/components/PurchaseView.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -23,6 +25,7 @@ export const AppRoutes = () => {
                 {/* Estas sub-rutas se renderizarán en el <Outlet /> de DashboardPage */}
                 <Route path="account" element={<AccountsView />} />
                 <Route path="card" element={<CardsView />} />
+                <Route path="credit-card" element={<CreditCardView />} /> 
                 <Route path="loan" element={<LoansView />} />
                 <Route path="loan-application" element={<LoanApplicationsView />} />
                 <Route path="product" element={<ProductsView />} />
@@ -30,6 +33,7 @@ export const AppRoutes = () => {
                 <Route path="user" element={<UsersView />} />
                 <Route path="exchange" element={<ExchangeAdminView />} />
                 <Route path="buscador" element={<AccountLookupView />} />
+                <Route path="purchase" element={<PurchaseView />} />
                 
                 {/* Redirección por defecto si entran solo a /dashboard */}
                 <Route index element={<Navigate to="account" />} />

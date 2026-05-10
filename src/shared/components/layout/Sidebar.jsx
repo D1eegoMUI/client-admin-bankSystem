@@ -24,7 +24,9 @@ const Sidebar = () => {
     const items = [
         { label: "Buscador", icon: SearchIcon, path: "buscador" },
         { label: "Cuenta", icon: AccountIcon, path: "account" },
-        { label: "Tarjeta", icon: CardIcon, path: "card" },
+        { label: "Tarjetas Débito", icon: CardIcon, path: "card" }, 
+        { label: "Tarjetas Crédito", icon: CardIcon, path: "credit-card" },
+        { label: "Compras", icon: LoanIcon, path: "purchase" },
         { label: "Cambio", icon: ExchangeIcon, path: "exchange" },
         { label: "Préstamo", icon: LoanIcon, path: "loan" },
         { label: "Solicitud de Préstamo", icon: AppLoanIcon, path: "loan-application" },

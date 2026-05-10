@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import * as api from "../../../shared/api/admin";
+import * as api from "../../../shared/Api/admin";
 
 // ================= USERS STORE =================
 export const useUserStore = create((set, get) => ({
@@ -100,8 +100,9 @@ export const useAccountStore = create((set, get) => ({
         try {
             set({ loading: true, error: null });
             const res = await api.getAccounts();
+            
             set({
-                accounts: res.data.accounts, // Según tu controlador res.status(200).json({ accounts })
+                accounts: res.data.accounts, 
                 loading: false
             });
         } catch (error) {
@@ -404,197 +405,129 @@ export const useProductStore = create((set, get) => ({
     }
 }));
 
-// ================= TRANSACTION STORE =================
-export const useTransactionStore = create((set, get) => ({
-    transactions: [],
-    accountHistory: [],
+// ================= CARD STORE =================
+// adminStore.js
+export const useCardStore = create((set, get) => ({
+    cards: [], // Lista unificada para la tabla general
     loading: false,
     error: null,
-    pagination: {
-        total: 0,
-        page: 1,
-        limit: 10
-    },
 
-    // Obtener transacciones generales (Vista Admin)
-    getTransactions: async (params) => {
+    // --- ACCIONES PARA CRÉDITO ---
+    getCreditCards: async (params) => {
         try {
-            set({ loading: true, error: null });
-            const res = await api.getTransactions(params);
-            set({
-                transactions: res.data.data,
-                pagination: res.data.pagination,
-                loading: false
-            });
+            set({ loading: true });
+            const res = await api.getCreditCards(params);
+            // Marcamos como CREDIT para el Frontend
+            const cardsWithTag = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
+            set({ cards: cardsWithTag, loading: false });
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al obtener transacciones",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
         }
     },
 
-    // Crear Depósito, Transferencia, Pago, etc.
-    createTransaction: async (data) => {
+    saveCreditCard: async (data) => {
         try {
-            set({ loading: true, error: null });
-            const res = await api.createTransaction(data);
-            
-            // Agregamos la nueva transacción al historial local
-            set({
-                transactions: [res.data.data.transaccion, ...get().transactions],
-                loading: false
-            });
-            
-            return res.data; // Útil para mostrar el "nuevoSaldoOrigen" en la UI
+            set({ loading: true });
+            const res = await api.createCreditCard(data); // Endpoint /creditCards
+            const newCard = { ...res.data.data, entityType: 'CREDIT' };
+            set({ cards: [newCard, ...get().cards], loading: false });
+            return res.data;
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al procesar la transacción",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
             throw error;
         }
     },
 
-    // Obtener historial formateado de una cuenta específica
-    getAccountHistory: async (id) => {
+    // --- ACCIONES PARA DÉBITO (CARD) ---
+    getDebitCards: async (params) => {
         try {
-            set({ loading: true, error: null, accountHistory: [] });
-            const res = await api.getAccountHistory(id);
-            set({
-                accountHistory: res.data.data, // Usa el array 'historialFormateado' del controller
-                loading: false
-            });
+            set({ loading: true });
+            const res = await api.getCards(params);
+            const cardsWithTag = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
+            set({ cards: cardsWithTag, loading: false });
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al obtener historial",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
         }
     },
 
-    // Revertir depósito (Solo ADMIN y < 1 min)
-    revertDeposit: async (id) => {
+    saveDebitCard: async (data) => {
         try {
-            set({ loading: true, error: null });
-            const res = await api.revertDeposit(id);
-            
-            // Actualizamos el estado de la transacción en la lista local a 'REVERTED'
-            set({
-                transactions: get().transactions.map(t => 
-                    t._id === id ? { ...t, status: 'REVERTED' } : t
-                ),
-                loading: false
-            });
+            set({ loading: true });
+            const res = await api.createCard(data); // Endpoint /cards
+            const newCard = { ...res.data.data, entityType: 'DEBIT' };
+            set({ cards: [newCard, ...get().cards], loading: false });
             return res.data;
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "No se pudo revertir el depósito",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
+            throw error;
+        }
+    },
+
+    // --- ACCIONES COMPARTIDAS (Eliminar/Estado) ---
+    deleteCard: async (id, type) => {
+        try {
+            set({ loading: true });
+            type === 'CREDIT' ? await api.deleteCreditCard(id) : await api.deleteCard(id);
+            set({ cards: get().cards.filter(c => (c._id || c.uid) !== id), loading: false });
+        } catch (error) {
+            set({ error: "Error al eliminar", loading: false });
+        }
+    }
+}));
+
+// ================= PURCHASE STORE =================
+export const usePurchaseStore = create((set, get) => ({
+    purchases: [],
+    loading: false,
+    error: null,
+
+    getPurchases: async (cardId = null) => {
+        try {
+            set({ loading: true });
+            const res = await api.getPurchases(cardId ? { cardId } : {});
+            set({ purchases: res.data.data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    createPurchase: async (data) => {
+        try {
+            set({ loading: true });
+            const res = await api.createPurchase(data);
+            set({ purchases: [res.data.data, ...get().purchases], loading: false });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
             throw error;
         }
     }
 }));
 
-// ================= CARD STORE =================
-export const useCardStore = create((set, get) => ({
-    cards: [],
+// ================= CREDIT CARD PAYMENT STORE =================
+export const useCreditCardPaymentStore = create((set, get) => ({
+    payments: [],
     loading: false,
     error: null,
-    pagination: {
-        totalRecords: 0,
-        totalPages: 0,
-        currentPage: 1
-    },
 
-    getCards: async (params) => {
-        try {
-            set({ loading: true, error: null });
-            const res = await api.getCards(params);
-            set({
-                cards: res.data.data,
-                pagination: res.data.pagination,
-                loading: false
-            });
-        } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al cargar tarjetas",
-                loading: false
-            });
-        }
-    },
-
-    saveCard: async (formData) => {
-        try {
-            set({ loading: true, error: null });
-            const res = await api.createCard(formData);
-            set({
-                cards: [res.data.data, ...get().cards],
-                loading: false
-            });
-            return res.data;
-        } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al crear la tarjeta",
-                loading: false
-            });
-            throw error;
-        }
-    },
-
-    editCard: async (id, formData) => {
-        try {
-            set({ loading: true, error: null });
-            const res = await api.updateCard(id, formData);
-            set({
-                cards: get().cards.map(c => c._id === id ? res.data.data : c),
-                loading: false
-            });
-            return res.data;
-        } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al actualizar la tarjeta",
-                loading: false
-            });
-            throw error;
-        }
-    },
-
-    toggleStatus: async (id) => {
+    getPayments: async (creditCardId = null) => {
         try {
             set({ loading: true });
-            const res = await api.toggleCardStatus(id);
-            set({
-                cards: get().cards.map(c => 
-                    c._id === id ? { ...c, isActive: res.data.data.isActive } : c
-                ),
-                loading: false
-            });
+            const res = await api.getCreditCardPayments(creditCardId ? { creditCardId } : {});
+            set({ payments: res.data.data, loading: false });
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al cambiar estado",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
         }
     },
 
-    approveCreditCard: async (id) => {
+    payCard: async (data) => {
         try {
             set({ loading: true });
-            const res = await api.approveCard(id);
-            set({
-                cards: get().cards.map(c => 
-                    c._id === id ? { ...c, isApproved: true } : c
-                ),
-                loading: false
-            });
+            const res = await api.payCreditCard(data);
+            set({ loading: false });
             return res.data;
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al aprobar tarjeta",
-                loading: false
-            });
+            set({ error: error.response?.data?.message, loading: false });
             throw error;
         }
     }

@@ -12,7 +12,7 @@ const axiosAuth = axios.create({
 });
 
 const axiosAdmin = axios.create({
-    baseURL: import.meta.env.VITE_ADMIN_URL, // Debe ser http://localhost:3001/restaurantSystem/v1
+    baseURL: import.meta.env.VITE_ADMIN_URL, 
     timeout: 8000,
     headers: { 'Content-Type': 'application/json' },
 });
@@ -22,6 +22,7 @@ axiosAuth.interceptors.request.use( (config) => {
     config._axiosClient = "auth";
 
     const token = useAuthStore.getState().token;
+    console.log("Interceptor Admin - URL:", config.url, "Token detectado:", token ? "SÍ" : "NO");
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;

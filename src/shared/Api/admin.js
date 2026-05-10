@@ -91,22 +91,57 @@ export const getAccountHistory = async (id) =>
 export const revertDeposit = async (id) => 
     await axiosAdmin.put(`/transactions/revert/${id}`);
 
-// ================= CARD =================
+// ================= CARDS (DÉBITO - Entidad: Card) =================
 export const getCards = async (params) => 
     await axiosAdmin.get("/cards", { params });
 
-export const createCard = async (formData) => 
-    await axiosAdmin.post("/cards", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-    });
+export const getCardById = async (id) => 
+    await axiosAdmin.get(`/cards/${id}`);
 
-export const updateCard = async (id, formData) => 
-    await axiosAdmin.put(`/cards/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-    });
+export const createCard = async (data) => 
+    await axiosAdmin.post("/cards", data);
+
+export const updateCard = async (id, data) => 
+    await axiosAdmin.put(`/cards/${id}`, data);
 
 export const toggleCardStatus = async (id) => 
     await axiosAdmin.put(`/cards/${id}/status`);
 
-export const approveCard = async (id) => 
-    await axiosAdmin.put(`/cards/${id}/approve`)
+export const deleteCard = async (id) => 
+    await axiosAdmin.delete(`/cards/${id}`);
+
+// ================= CREDIT CARDS (CRÉDITO - Entidad: CreditCard) =================
+export const getCreditCards = async (params) => 
+    await axiosAdmin.get("/creditCards", { params });
+
+export const getCreditCardById = async (id) => 
+    await axiosAdmin.get(`/creditCards/${id}`);
+
+export const createCreditCard = async (data) => 
+    await axiosAdmin.post("/creditCards", data);
+
+export const updateCreditCard = async (id, data) => 
+    await axiosAdmin.put(`/creditCards/${id}`, data);
+
+export const toggleCreditCardStatus = async (id) => 
+    await axiosAdmin.put(`/creditCards/${id}/status`);
+
+export const approveCreditCard = async (id) => 
+    await axiosAdmin.put(`/creditCards/${id}/approve`);
+
+export const deleteCreditCard = async (id) => 
+    await axiosAdmin.delete(`/creditCards/${id}`);
+
+// ================= PURCHASES =================
+export const getPurchases = async (params) =>
+    await axiosAdmin.get("/purchases", { params });
+
+export const createPurchase = async (data) =>
+    await axiosAdmin.post("/purchases", data);
+
+// ================= CREDIT CARD PAYMENTS =================
+export const getCreditCardPayments = async (params) =>
+    await axiosAdmin.get("/creditCardPayments", { params });
+
+export const payCreditCard = async (data) =>
+    await axiosAdmin.post("/creditCardPayments", data);
