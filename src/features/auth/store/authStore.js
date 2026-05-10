@@ -46,36 +46,28 @@ export const useAuthStore = create(
 
             //------------------------------------------------------------------------------
             login: async ({ Email, Password }) => {
-                const { data } = await loginRequest({ Email, Password })
+                const response = await loginRequest({ Email, Password });
+                const responseData = response.data; // Este es el objeto que pegaste
 
-                //Solo administadores pueden iniciar sesion en cliente-admin
-                const role = data?.userDetails?.role;
-                if (role != "ADMIN_ROLE") {
-                    const message = "No tienes permisos para acceder como administrador";
+                console.log("Estructura real:", responseData);
 
-                    set({
-                        user: null,
-                        token: null,
-                        refreshToken: null,
-                        expiresAt: null,
-                        isAuthenticated: false,
-                        loading: false,
-                        error: message,
-                    });
+                const role = responseData.data?.role;
 
+                if (role !== "ADMIN_ROLE") {
+                    const message = "No tienes permisos de administrador";
+                    set({ isAuthenticated: false, loading: false, error: message });
                     toast.error(message);
                     return { success: false, error: message };
                 }
 
                 set({
-                    user: data.userDetails,
-                    token: data.accessToken || data.token,
-                    refreshToken: data.refreshToken,
-                    expiresAt: data.expiresIn || data.expiresAt,
+                    user: responseData.data,
+                    token: responseData.token,
                     isAuthenticated: true,
                     loading: false,
                 });
-                return { success: true }
+
+                return { success: true };
             },
             //---------------------------------------------------------------------------------------
         }),

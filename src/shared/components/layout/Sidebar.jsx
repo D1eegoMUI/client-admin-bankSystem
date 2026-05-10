@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { SupportModal } from "../../../features/Support/components/SupportModal.jsx";
-import AccountIcon from "../../../assets/Icons/User.svg";
+import AccountIcon from "../../../assets/Icons/user.svg";
 import CardIcon from "../../../assets/Icons/credit-card.svg";
 import ExchangeIcon from "../../../assets/Icons/exchange.svg";
 import FavoriteIcon from "../../../assets/Icons/star.svg";
@@ -9,7 +9,7 @@ import LoanIcon from "../../../assets/Icons/Loan.svg";
 import AppLoanIcon from "../../../assets/Icons/LoanApp.svg";
 import ProductIcon from "../../../assets/Icons/package.svg";
 import TransactionIcon from "../../../assets/Icons/transaction.svg";
-import UsersIcon from "../../../assets/Icons/users.svg";
+import UsersIcon from "../../../assets/Icons/user.svg";
 import SearchIcon from "../../../assets/Icons/map-pin.svg";
 
 
