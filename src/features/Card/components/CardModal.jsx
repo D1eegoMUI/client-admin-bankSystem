@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSaveCard } from "../hooks/useSaveCard";
 import { useAccountStore } from "../../User/Store/adminStore";
+import { SearchableSelect } from "../../../shared/components/ui/SearchableSelect";
 
 export const CardModal = ({ isOpen, onClose, cardData = null }) => {
-    const { register, handleSubmit, reset } = useForm();
-    const { saveCardData } = useSaveCard();
+    const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
+    const accountValue = watch('account', '');
+    const { saveCardData, loading } = useSaveCard();
     const { accounts, getAccounts } = useAccountStore();
 
     useEffect(() => {
@@ -18,7 +20,7 @@ export const CardModal = ({ isOpen, onClose, cardData = null }) => {
                     brand: cardData.brand || 'VISA'
                 });
             } else {
-                reset({ brand: 'VISA' });
+                reset({ brand: 'VISA', holderName: '' });
             }
         }
     }, [isOpen, getAccounts, cardData, reset]);
@@ -38,28 +40,82 @@ export const CardModal = ({ isOpen, onClose, cardData = null }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-emerald-950/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="p-6 bg-emerald-700 text-white">
-                    <h2 className="text-xl font-black uppercase italic">Emitir <span className="text-emerald-200">Tarjeta Débito</span></h2>
+        <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-[100] px-3 animate-fadeIn">
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden border border-emerald-100 animate-slideDown"
+            >
+                {/* Header con el gradiente institucional de Kinal Bank */}
+                <div
+                    className="p-7 text-white"
+                    style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}
+                >
+                    <h2 className="text-2xl font-bold tracking-tight">Emisión de Débito</h2>
+                    <p className="text-emerald-100 text-xs opacity-90 uppercase font-black tracking-widest mt-1">
+                        Vinculación de cuenta monetaria
+                    </p>
                 </div>
-                <div className="p-8 space-y-4">
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Cuenta Vinculada</label>
-                        <select {...register("account", { required: true })} className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 font-bold">
-                            <option value="">Seleccione cuenta...</option>
-                            {accounts?.map(acc => (
-                                <option key={acc._id} value={acc._id}>{acc.accountNumber} - {acc.user?.UserName}</option>
-                            ))}
-                        </select>
+
+                <div className="p-8 space-y-6">
+                    <div className="grid grid-cols-1 gap-5">
+
+                        {/* Selector de Cuenta */}
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Cuenta Vinculada</label>
+                            <SearchableSelect
+                                options={accounts.map(a => ({
+                                    value: a._id,
+                                    label: `${a.accountNumber} — ${a.user?.UserName ?? ''}`
+                                }))}
+                                value={accountValue}
+                                onChange={val => setValue('account', val)}
+                                placeholder="Buscar número de cuenta..."
+                            />
+                            {errors.account && <span className="text-red-500 text-[10px] font-bold mt-1 ml-1">Debe seleccionar una cuenta activa</span>}
+                        </div>
+
+                        {/* Nombre en el Plástico */}
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Nombre en el Plástico</label>
+                            <input
+                                {...register("holderName", { required: true })}
+                                type="text"
+                                placeholder="NOMBRE TAL CUAL APARECERÁ"
+                                className={`px-4 py-3.5 rounded-2xl border-2 outline-none font-black uppercase transition-all ${errors.holderName ? "border-red-200 bg-red-50" : "border-gray-100 focus:border-emerald-500 bg-gray-50/50"
+                                    }`}
+                            />
+                            {errors.holderName && <span className="text-red-500 text-[10px] font-bold mt-1 ml-1">El nombre del titular es requerido</span>}
+                        </div>
+
+                        {/* Red de Pago */}
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Franquicia / Red</label>
+                            <select
+                                {...register("brand")}
+                                className="px-4 py-3.5 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 outline-none font-bold bg-gray-50/50"
+                            >
+                                <option value="VISA">VISA</option>
+                                <option value="MASTERCARD">MASTERCARD</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Nombre en el Plástico</label>
-                        <input {...register("holderName", { required: true })} type="text" className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 font-bold uppercase" />
-                    </div>
-                    <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={onClose} className="flex-1 py-3 text-gray-400 font-black uppercase text-[10px]">Cancelar</button>
-                        <button type="submit" className="flex-[2] bg-emerald-600 text-white py-3 rounded-xl font-black uppercase text-[10px]">Generar Débito</button>
+
+                    {/* Footer de Acciones */}
+                    <div className="flex justify-end items-center gap-4 pt-6 border-t border-gray-50">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-6 py-2 text-emerald-700 font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-50 rounded-xl transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-10 py-3.5 bg-emerald-600 text-white font-black rounded-2xl shadow-lg shadow-emerald-100 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 uppercase text-[10px] tracking-widest"
+                        >
+                            {loading ? 'Procesando...' : 'Generar Tarjeta'}
+                        </button>
                     </div>
                 </div>
             </form>

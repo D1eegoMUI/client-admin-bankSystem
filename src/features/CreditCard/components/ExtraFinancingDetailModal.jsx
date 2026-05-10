@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useExtraFinancingStore, useAccountStore } from "../../User/Store/adminStore";
+import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
 
 export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
     const { details, getDetails, payInstallment, loading } = useExtraFinancingStore();
@@ -13,7 +14,7 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
             getAccounts();
             setSelectedAccount("");
         }
-    }, [isOpen, financing]);
+    }, [isOpen, financing, getDetails, getAccounts]);
 
     const handlePay = async () => {
         if (!selectedAccount) return;
@@ -35,85 +36,104 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
     const nextInstallment = pending[0];
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4">
-            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
-                <div className="p-6 bg-blue-700 text-white flex justify-between items-start">
+        <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-[110] px-4 animate-fadeIn">
+            <div className="bg-white rounded-[2.5rem] w-full max-w-3xl overflow-hidden shadow-2xl border border-emerald-100 animate-slideDown">
+
+                {/* Header Institucional */}
+                <div
+                    className="p-7 text-white flex justify-between items-start"
+                    style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}
+                >
                     <div>
-                        <h2 className="text-xl font-black uppercase italic">Cuotas</h2>
-                        <p className="text-blue-200 text-[10px] mt-1">{financing.description}</p>
-                    </div>
-                    <button onClick={onClose} className="text-white text-2xl font-black">×</button>
-                </div>
-
-                {/* Resumen */}
-                <div className="grid grid-cols-3 gap-3 p-5 bg-blue-50 border-b border-blue-100">
-                    <div className="text-center">
-                        <p className="text-[9px] font-black text-gray-400 uppercase">Total</p>
-                        <p className="text-base font-black text-blue-700">Q {financing.totalAmount?.toLocaleString()}</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-[9px] font-black text-gray-400 uppercase">Saldo</p>
-                        <p className="text-base font-black text-red-500">Q {financing.remainingBalance?.toLocaleString()}</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-[9px] font-black text-gray-400 uppercase">Cuota</p>
-                        <p className="text-base font-black text-gray-700">Q {financing.monthlyPayment?.toFixed(2)}</p>
-                    </div>
-                </div>
-
-                {/* Pagar próxima cuota */}
-                {nextInstallment && (
-                    <div className="p-5 border-b border-gray-100 bg-amber-50">
-                        <p className="text-[10px] font-black text-gray-400 uppercase mb-3">
-                            Próxima cuota — #{nextInstallment.installmentNumber} — Q {nextInstallment.amount?.toFixed(2)}
+                        <h2 className="text-2xl font-bold tracking-tight">Detalle de Cuotas</h2>
+                        <p className="text-emerald-100 text-xs opacity-90 uppercase font-black tracking-widest mt-1">
+                            Plan: {financing.description}
                         </p>
+                    </div>
+                    <button onClick={onClose} className="text-white hover:text-emerald-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Resumen Financiero Rápido */}
+                <div className="grid grid-cols-3 gap-4 p-6 bg-emerald-50/50 border-b border-emerald-100">
+                    <div className="text-center">
+                        <p className="text-[10px] font-black text-emerald-800/40 uppercase tracking-tighter">Monto Total</p>
+                        <p className="text-lg font-black text-emerald-900 italic">Q {financing.totalAmount?.toLocaleString()}</p>
+                    </div>
+                    <div className="text-center border-x border-emerald-100">
+                        <p className="text-[10px] font-black text-emerald-800/40 uppercase tracking-tighter">Saldo Pendiente</p>
+                        <p className="text-lg font-black text-red-600 italic">Q {financing.remainingBalance?.toLocaleString()}</p>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-[10px] font-black text-emerald-800/40 uppercase tracking-tighter">Mensualidad</p>
+                        <p className="text-lg font-black text-emerald-700 italic">Q {financing.monthlyPayment?.toFixed(2)}</p>
+                    </div>
+                </div>
+
+                {/* Sección de Pago de Próxima Cuota */}
+                {nextInstallment && (
+                    <div className="p-6 border-b border-emerald-100 bg-amber-50/30">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="h-2 w-2 bg-amber-500 rounded-full animate-pulse" />
+                            <p className="text-[11px] font-black text-amber-800 uppercase tracking-widest">
+                                Próxima cuota — #{nextInstallment.installmentNumber} — Q {nextInstallment.amount?.toFixed(2)}
+                            </p>
+                        </div>
                         <div className="flex gap-3">
-                            <select
+                            <SearchableSelect
+                                options={accounts.map(a => ({
+                                    value: a._id,
+                                    label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                }))}
                                 value={selectedAccount}
-                                onChange={e => setSelectedAccount(e.target.value)}
-                                className="flex-1 p-3 rounded-xl border-2 border-gray-100 font-bold text-sm"
-                            >
-                                <option value="">-- Cuenta de origen --</option>
-                                {accounts.map(a => (
-                                    <option key={a._id} value={a._id}>
-                                        {a.accountNumber} — Q {a.balance?.toLocaleString()}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={val => setSelectedAccount(val)}
+                                placeholder="Buscar número de cuenta..."
+                            />
                             <button
                                 onClick={handlePay}
                                 disabled={!selectedAccount || paying || loading}
-                                className="px-5 bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase disabled:opacity-50"
+                                className="px-10 bg-emerald-700 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-900 disabled:opacity-50 transition-all active:scale-95"
                             >
-                                {paying ? '...' : 'Pagar'}
+                                {paying ? '...' : 'Pagar Ahora'}
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* Lista de cuotas */}
-                <div className="overflow-y-auto max-h-64">
+                {/* Tabla de cuotas estilizada */}
+                <div className="overflow-y-auto max-h-[40vh]">
                     {loading ? (
-                        <p className="text-center p-6 text-gray-400">Cargando...</p>
+                        <div className="flex flex-col items-center py-10 gap-2">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+                            <p className="text-emerald-800/40 font-bold text-[10px] uppercase">Obteniendo cronograma...</p>
+                        </div>
                     ) : (
-                        <table className="w-full">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-gray-100">
-                                    <th className="text-left p-3 text-[10px] font-black text-gray-400 uppercase">#</th>
-                                    <th className="text-left p-3 text-[10px] font-black text-gray-400 uppercase">Monto</th>
-                                    <th className="text-left p-3 text-[10px] font-black text-gray-400 uppercase">Vence</th>
-                                    <th className="text-left p-3 text-[10px] font-black text-gray-400 uppercase">Estado</th>
+                                <tr className="bg-gray-50/50">
+                                    <th className="p-4 text-[10px] font-black text-emerald-800/40 uppercase tracking-widest">ID</th>
+                                    <th className="p-4 text-[10px] font-black text-emerald-800/40 uppercase tracking-widest">Monto</th>
+                                    <th className="p-4 text-[10px] font-black text-emerald-800/40 uppercase tracking-widest">Vencimiento</th>
+                                    <th className="p-4 text-center text-[10px] font-black text-emerald-800/40 uppercase tracking-widest">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {details.map(d => (
-                                    <tr key={d._id} className="border-b border-gray-50 hover:bg-gray-50">
-                                        <td className="p-3 font-black text-sm text-gray-600">{d.installmentNumber}</td>
-                                        <td className="p-3 font-bold text-sm text-gray-800">Q {d.amount?.toFixed(2)}</td>
-                                        <td className="p-3 text-sm text-gray-400">{new Date(d.expectedDate).toLocaleDateString('es-GT')}</td>
-                                        <td className="p-3">
-                                            <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${d.status === 'PAID' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                {d.status === 'PAID' ? 'Pagada' : 'Pendiente'}
+                                    <tr key={d._id} className="border-b border-gray-50 hover:bg-emerald-50/20 transition-colors group">
+                                        <td className="p-4 font-black text-xs text-emerald-900/60">#{d.installmentNumber}</td>
+                                        <td className="p-4 font-black text-sm text-emerald-950">Q {d.amount?.toFixed(2)}</td>
+                                        <td className="p-4 text-xs font-bold text-gray-400">
+                                            {new Date(d.expectedDate).toLocaleDateString('es-GT', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${d.status === 'PAID'
+                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                    : 'bg-amber-100 text-amber-700'
+                                                }`}>
+                                                {d.status === 'PAID' ? '✓ Pagada' : '⧗ Pendiente'}
                                             </span>
                                         </td>
                                     </tr>
@@ -123,8 +143,17 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
                     )}
                 </div>
 
-                <div className="p-4 border-t border-gray-100 flex justify-between text-[10px] font-black text-gray-400 uppercase">
-                    <span>{paid.length}/{details.length} cuotas pagadas</span>
+                {/* Footer de Resumen Final */}
+                <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-emerald-800/40">
+                    <div className="flex gap-4">
+                        <span>Progreso: {paid.length} de {details.length}</span>
+                        <div className="w-32 h-2 bg-gray-200 rounded-full self-center overflow-hidden">
+                            <div
+                                className="h-full bg-emerald-500 transition-all duration-1000"
+                                style={{ width: `${(paid.length / details.length) * 100}%` }}
+                            />
+                        </div>
+                    </div>
                     <span className={financing.status === 'PAID' ? 'text-emerald-600' : 'text-amber-600'}>
                         {financing.status}
                     </span>

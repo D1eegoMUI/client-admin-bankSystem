@@ -25,9 +25,6 @@ export const CreditCardItem = ({ card }) => {
                         <p className="text-lg font-black text-blue-600">{card.interestRate || '15'}%</p>
                     </div>
                 </div>
-                <button className="w-full mt-4 py-2.5 bg-slate-900 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-black transition-all">
-                    Registrar Pago
-                </button>
             </div>
         </div>
     );

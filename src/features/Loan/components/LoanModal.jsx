@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLoanStore, useAccountStore, useUserStore } from '../../User/Store/adminStore';
+import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
 
 export const LoanModal = ({ onClose }) => {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
         defaultValues: { interestRate: 12, termMonths: 12 }
-    });
+    }); const borrowerValue = watch('borrower', '');
+    const accountValue = watch('account', '');
     const { createLoan, loading } = useLoanStore();
     const { accounts, getAccounts } = useAccountStore();
     const { users, getUsers } = useUserStore();
@@ -53,27 +55,29 @@ export const LoanModal = ({ onClose }) => {
 
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-xs font-black text-gray-400 uppercase mb-1">Cliente (Prestatario)</label>
-                            <select {...register('borrower', { required: true })} className="px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 outline-none font-bold">
-                                <option value="">Seleccionar cliente...</option>
-                                {users.map(u => (
-                                    <option key={u.uid} value={u.uid}>
-                                        {u.UserName} {u.UserSurname}
-                                    </option>
-                                ))}
-                            </select>
+                            <SearchableSelect
+                                options={users.map(u => ({
+                                    value: u.uid,
+                                    label: `${u.UserName} ${u.UserSurname}`
+                                }))}
+                                value={borrowerValue}
+                                onChange={val => setValue('borrower', val)}
+                                placeholder="Buscar cliente..."
+                            />
                             {errors.borrower && <span className="text-red-500 text-[10px] mt-1">Campo requerido</span>}
                         </div>
 
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-xs font-black text-gray-400 uppercase mb-1">Cuenta para acreditar fondos</label>
-                            <select {...register('account', { required: true })} className="px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 outline-none font-bold">
-                                <option value="">Seleccionar cuenta...</option>
-                                {accounts.map(a => (
-                                    <option key={a._id} value={a._id}>
-                                        {a.accountNumber} — Q{a.balance?.toLocaleString()}
-                                    </option>
-                                ))}
-                            </select>
+                            <SearchableSelect
+                                options={accounts.map(a => ({
+                                    value: a._id,
+                                    label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                }))}
+                                value={accountValue}
+                                onChange={val => setValue('account', val)}
+                                placeholder="Buscar número de cuenta..."
+                            />
                             {errors.account && <span className="text-red-500 text-[10px] mt-1">Campo requerido</span>}
                         </div>
 

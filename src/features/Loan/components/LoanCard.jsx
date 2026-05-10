@@ -2,6 +2,7 @@ import * as api from '../../../shared/Api/admin.js';
 import React, { useState } from 'react';
 import { User, AlertTriangle, ChevronDown, ChevronUp, CreditCard, X, CheckCircle2 } from 'lucide-react';
 import { useLoanStore, useAccountStore } from '../../User/Store/adminStore';
+import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
 
 export const LoanCard = ({ loan, isAdmin }) => {
     const paidAmount = loan.amount - loan.remainingBalance;
@@ -16,6 +17,9 @@ export const LoanCard = ({ loan, isAdmin }) => {
     const [loanDetails, setLoanDetails] = useState([]);
     const [loadingDetails, setLoadingDetails] = useState(false);
     const { accounts, getAccounts } = useAccountStore();
+
+    const [nextInstallment, setNextInstallment] = useState(null);
+    const [loadingInstallment, setLoadingInstallment] = useState(false);
 
     const statusColors = {
         ACTIVE: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -38,11 +42,25 @@ export const LoanCard = ({ loan, isAdmin }) => {
         setShowDetails(prev => !prev);
     };
 
-    const handleOpenPayModal = () => {
+    const handleOpenPayModal = async () => {
         getAccounts();
         setPayResult(null);
         setSelectedAccount('');
+        setNextInstallment(null);
         setShowPayModal(true);
+
+        setLoadingInstallment(true);
+        try {
+            const res = await api.getLoanDetails(loan._id);
+            const pending = res.data.data.filter(d => d.status === 'PENDING');
+            setNextInstallment(pending[0] ?? null);
+            // Aprovechar para actualizar la tabla si ya está abierta
+            if (showDetails) setLoanDetails(res.data.data);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingInstallment(false);
+        }
     };
 
     const handlePay = async () => {
@@ -50,8 +68,11 @@ export const LoanCard = ({ loan, isAdmin }) => {
         try {
             const res = await payLoanInstallment(loan._id, selectedAccount);
             setPayResult({ success: true, message: res.message });
-            // Refrescar cuotas si están abiertas
-            if (showDetails) fetchLoanDetails(loan._id);
+            // Refrescar cuotas locales si la tabla está abierta
+            if (showDetails) {
+                const updated = await api.getLoanDetails(loan._id);
+                setLoanDetails(updated.data.data);
+            }
         } catch (e) {
             setPayResult({ success: false, message: e.response?.data?.message || 'Error al procesar el pago' });
         }
@@ -166,13 +187,12 @@ export const LoanCard = ({ loan, isAdmin }) => {
                                                 <td className="px-4 py-3 text-right text-gray-500">Q{d.principal.toFixed(2)}</td>
                                                 <td className="px-4 py-3 text-right text-gray-500">Q{d.interest.toFixed(2)}</td>
                                                 <td className="px-4 py-3 text-center">
-                                                    <span className={`px-2 py-1 rounded-full text-[9px] font-black border ${
-                                                        d.status === 'PAID'
-                                                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                                                            : d.status === 'OVERDUE'
+                                                    <span className={`px-2 py-1 rounded-full text-[9px] font-black border ${d.status === 'PAID'
+                                                        ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                                        : d.status === 'OVERDUE'
                                                             ? 'bg-red-100 text-red-700 border-red-200'
                                                             : 'bg-amber-100 text-amber-700 border-amber-200'
-                                                    }`}>
+                                                        }`}>
                                                         {d.status}
                                                     </span>
                                                 </td>
@@ -187,9 +207,12 @@ export const LoanCard = ({ loan, isAdmin }) => {
             </div>
 
             {/* Modal de pago */}
+            {/* Modal de pago */}
             {showPayModal && (
                 <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-50 px-3">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-emerald-100">
+
+                        {/* ✅ Header */}
                         <div className="p-6 text-white flex justify-between items-center" style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}>
                             <div>
                                 <h2 className="text-xl font-bold">Pagar Cuota</h2>
@@ -202,46 +225,67 @@ export const LoanCard = ({ loan, isAdmin }) => {
                             </button>
                         </div>
 
-                        <div className="p-6 space-y-5">
-                            {/* Info del préstamo */}
-                            <div className="bg-emerald-50 rounded-2xl p-4 grid grid-cols-2 gap-3">
-                                <div>
-                                    <p className="text-[9px] font-black uppercase text-emerald-600 mb-1">Saldo Restante</p>
-                                    <p className="text-lg font-black text-emerald-900">Q{loan.remainingBalance.toLocaleString()}</p>
+                        {/* ✅ Contenido — solo este bloque, sin duplicado */}
+                        <div className="p-6 space-y-4">
+
+                            {loadingInstallment ? (
+                                <div className="bg-gray-50 rounded-2xl p-4 text-center text-xs text-gray-400 font-bold">
+                                    Cargando cuota...
                                 </div>
-                                <div>
-                                    <p className="text-[9px] font-black uppercase text-emerald-600 mb-1">Plazo</p>
-                                    <p className="text-lg font-black text-emerald-900">{loan.termMonths} meses</p>
+                            ) : nextInstallment ? (
+                                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-[10px] font-black uppercase text-emerald-700 tracking-widest">Próxima Cuota</p>
+                                        <span className="text-[9px] font-black px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full border border-emerald-200">
+                                            #{nextInstallment.installmentNumber} de {loan.termMonths}
+                                        </span>
+                                    </div>
+                                    <p className="text-3xl font-black text-emerald-900">Q{nextInstallment.amount.toFixed(2)}</p>
+                                    <div className="grid grid-cols-3 gap-2 pt-1 border-t border-emerald-100">
+                                        <div>
+                                            <p className="text-[9px] uppercase text-emerald-600 font-black mb-0.5">Capital</p>
+                                            <p className="text-sm font-black text-gray-700">Q{nextInstallment.principal.toFixed(2)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] uppercase text-emerald-600 font-black mb-0.5">Interés</p>
+                                            <p className="text-sm font-black text-gray-700">Q{nextInstallment.interest.toFixed(2)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] uppercase text-emerald-600 font-black mb-0.5">Vence</p>
+                                            <p className="text-sm font-black text-gray-700">
+                                                {new Date(nextInstallment.expectedDate).toLocaleDateString('es-GT')}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                            ) : (
+                                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center text-xs text-blue-600 font-bold">
+                                    No hay cuotas pendientes
+                                </div>
+                            )}
+
+                            <div className="bg-gray-50 rounded-2xl p-3 flex justify-between items-center">
+                                <p className="text-[9px] font-black uppercase text-gray-400">Saldo Total Restante</p>
+                                <p className="text-sm font-black text-emerald-700">Q{loan.remainingBalance.toLocaleString()}</p>
                             </div>
 
-                            {/* Selección de cuenta */}
                             <div className="flex flex-col">
                                 <label className="text-xs font-black text-gray-400 uppercase mb-2">Cuenta a debitar</label>
-                                <select
+                                <SearchableSelect
+                                    options={accounts.map(a => ({
+                                        value: a._id,
+                                        label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                    }))}
                                     value={selectedAccount}
-                                    onChange={e => setSelectedAccount(e.target.value)}
-                                    className="px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 outline-none font-bold"
-                                >
-                                    <option value="">Seleccionar cuenta...</option>
-                                    {accounts.map(a => (
-                                        <option key={a._id} value={a._id}>
-                                            {a.accountNumber} — Q{a.balance?.toLocaleString()}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={val => setSelectedAccount(val)}
+                                    placeholder="Buscar número de cuenta..."
+                                />
                             </div>
 
-                            {/* Resultado */}
                             {payResult && (
-                                <div className={`flex items-center gap-3 p-3 rounded-2xl text-sm font-bold ${
-                                    payResult.success
-                                        ? 'bg-emerald-50 text-emerald-700'
-                                        : 'bg-red-50 text-red-600'
-                                }`}>
-                                    {payResult.success
-                                        ? <CheckCircle2 size={16} />
-                                        : <AlertTriangle size={16} />}
+                                <div className={`flex items-center gap-3 p-3 rounded-2xl text-sm font-bold ${payResult.success ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                                    }`}>
+                                    {payResult.success ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
                                     {payResult.message}
                                 </div>
                             )}
@@ -255,13 +299,14 @@ export const LoanCard = ({ loan, isAdmin }) => {
                                 </button>
                                 <button
                                     onClick={handlePay}
-                                    disabled={loading || !selectedAccount || payResult?.success}
+                                    disabled={loading || !selectedAccount || !nextInstallment || payResult?.success}
                                     className="px-8 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all disabled:opacity-50"
                                 >
-                                    {loading ? 'Procesando...' : 'Confirmar Pago'}
+                                    {loading ? 'Procesando...' : `Pagar Q${nextInstallment?.amount.toFixed(2) ?? '--'}`}
                                 </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             )}

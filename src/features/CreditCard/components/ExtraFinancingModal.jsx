@@ -3,12 +3,14 @@ import { useForm } from "react-hook-form";
 import { useExtraFinancingStore } from "../../User/Store/adminStore";
 
 export const ExtraFinancingModal = ({ isOpen, onClose, card }) => {
-    const { register, handleSubmit, reset } = useForm({ defaultValues: { installments: 12, interestRate: 1.5 } });
+    const { register, handleSubmit, reset, formState: { errors } } = useForm({ 
+        defaultValues: { installments: 12, interestRate: 1.5 } 
+    });
     const { createFinancing, loading } = useExtraFinancingStore();
 
     useEffect(() => {
         if (isOpen) reset({ installments: 12, interestRate: 1.5 });
-    }, [isOpen]);
+    }, [isOpen, reset]);
 
     const onSubmit = async (data) => {
         try {
@@ -28,38 +30,96 @@ export const ExtraFinancingModal = ({ isOpen, onClose, card }) => {
     if (!isOpen || !card) return null;
 
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="p-6 bg-blue-700 text-white">
-                    <h2 className="text-xl font-black uppercase italic">Extra <span className="text-blue-200">Financiamiento</span></h2>
-                    <p className="text-blue-300 text-[10px] mt-1">**** **** **** {card.cardNumber?.slice(-4)}</p>
+        <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-[110] px-3 animate-fadeIn">
+            <form 
+                onSubmit={handleSubmit(onSubmit)} 
+                className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden border border-emerald-100 animate-slideDown"
+            >
+                {/* Header Institucional Kinal Bank */}
+                <div 
+                    className="p-7 text-white" 
+                    style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}
+                >
+                    <h2 className="text-2xl font-bold tracking-tight">Nuevo Financiamiento</h2>
+                    <p className="text-emerald-100 text-xs opacity-90 uppercase font-black tracking-widest mt-1">
+                        Tarjeta: **** {card.cardNumber?.slice(-4)}
+                    </p>
                 </div>
-                <div className="p-8 space-y-4">
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Descripción</label>
-                        <input {...register("description", { required: true })} type="text" placeholder="Ej. Compra de electrodomésticos" className="w-full p-3 rounded-xl border-2 border-gray-100 font-bold" />
+
+                <div className="p-8 space-y-5">
+                    {/* Campo: Descripción */}
+                    <div className="flex flex-col">
+                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Concepto / Descripción</label>
+                        <input 
+                            {...register("description", { required: true })} 
+                            type="text" 
+                            placeholder="Ej. Compra de mobiliario" 
+                            className={`px-4 py-3.5 rounded-2xl border-2 outline-none font-bold transition-all ${
+                                errors.description ? "border-red-200 bg-red-50" : "border-gray-100 focus:border-emerald-500 bg-gray-50/50 text-emerald-900"
+                            }`}
+                        />
                     </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Monto Total (GTQ)</label>
-                        <input {...register("totalAmount", { required: true, min: 1 })} type="number" step="0.01" className="w-full p-3 rounded-xl border-2 border-gray-100 font-bold" />
+
+                    {/* Campo: Monto */}
+                    <div className="flex flex-col">
+                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Monto a Financiar (GTQ)</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-emerald-600">Q</span>
+                            <input 
+                                {...register("totalAmount", { required: true, min: 1 })} 
+                                type="number" 
+                                step="0.01" 
+                                placeholder="0.00"
+                                className="w-full pl-10 pr-4 py-3.5 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 bg-gray-50/50 outline-none font-black text-emerald-900"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Plazo (cuotas)</label>
-                        <select {...register("installments", { required: true })} className="w-full p-3 rounded-xl border-2 border-gray-100 font-bold">
-                            <option value={12}>12 meses</option>
-                            <option value={24}>24 meses</option>
-                            <option value={36}>36 meses</option>
-                            <option value={48}>48 meses</option>
-                        </select>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Campo: Plazo */}
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Plazo</label>
+                            <select 
+                                {...register("installments", { required: true })} 
+                                className="px-4 py-3.5 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 bg-gray-50/50 outline-none font-bold text-emerald-900 cursor-pointer"
+                            >
+                                <option value={12}>12 meses</option>
+                                <option value={24}>24 meses</option>
+                                <option value={36}>36 meses</option>
+                                <option value={48}>48 meses</option>
+                            </select>
+                        </div>
+
+                        {/* Campo: Tasa */}
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Interés (%)</label>
+                            <div className="relative">
+                                <input 
+                                    {...register("interestRate", { required: true, min: 0 })} 
+                                    type="number" 
+                                    step="0.1" 
+                                    className="w-full px-4 py-3.5 rounded-2xl border-2 border-gray-100 focus:border-emerald-500 bg-gray-50/50 outline-none font-black text-emerald-900"
+                                />
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-emerald-600">%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase">Tasa de Interés (%)</label>
-                        <input {...register("interestRate", { required: true, min: 0 })} type="number" step="0.1" className="w-full p-3 rounded-xl border-2 border-gray-100 font-bold" />
-                    </div>
-                    <div className="flex gap-2 pt-4">
-                        <button type="button" onClick={onClose} className="flex-1 font-bold text-gray-400 uppercase text-[10px]">Cancelar</button>
-                        <button type="submit" disabled={loading} className="flex-1 bg-blue-700 text-white py-3 rounded-xl font-black uppercase text-[10px] disabled:opacity-50">
-                            {loading ? 'Procesando...' : 'Crear Financiamiento'}
+
+                    {/* Footer de Acciones */}
+                    <div className="flex justify-end items-center gap-4 pt-6 border-t border-gray-50">
+                        <button 
+                            type="button" 
+                            onClick={onClose} 
+                            className="px-6 py-2 text-emerald-700 font-bold uppercase text-[10px] tracking-widest hover:bg-emerald-50 rounded-xl transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="px-10 py-3.5 bg-emerald-600 text-white font-black rounded-2xl shadow-lg shadow-emerald-100 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 uppercase text-[10px] tracking-widest"
+                        >
+                            {loading ? 'Procesando...' : 'Crear Plan'}
                         </button>
                     </div>
                 </div>

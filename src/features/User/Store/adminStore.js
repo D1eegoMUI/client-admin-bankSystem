@@ -246,14 +246,13 @@ export const useLoanStore = create((set, get) => ({
         try {
             set({ loading: true, error: null });
             const res = await api.payLoanInstallment({ loanId, accountId });
-            // Actualiza saldo y status del préstamo en el estado local
             set({
                 loans: get().loans.map(l =>
                     l._id === loanId
                         ? {
                             ...l,
                             remainingBalance: res.data.saldoRestantePrestamo,
-                            status: res.data.saldoRestantePrestamo <= 0 ? 'PAID' : l.status
+                            status: res.data.loanStatus
                         }
                         : l
                 ),

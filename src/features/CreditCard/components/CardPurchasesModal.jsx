@@ -6,44 +6,87 @@ export const CardPurchasesModal = ({ isOpen, onClose, card }) => {
 
     useEffect(() => {
         if (isOpen && card) getPurchases(card._id);
-    }, [isOpen, card]);
+    }, [isOpen, card, getPurchases]);
 
     if (!isOpen || !card) return null;
 
+    // Cálculo del total para el resumen
+    const totalAmount = purchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+
     return (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center z-[100] p-4">
-            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
-                <div className="p-6 bg-amber-600 text-white flex justify-between items-center">
+        <div className="fixed inset-0 bg-orange-950/40 backdrop-blur-sm flex justify-center items-center z-[110] px-4 animate-fadeIn">
+            {/* max-w-2xl para un look de estado de cuenta espacioso */}
+            <div className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-orange-100 animate-slideDown">
+                
+                {/* Header con Gradiente Naranja/Ámbar */}
+                <div 
+                    className="p-7 text-white flex justify-between items-center" 
+                    style={{ background: "linear-gradient(90deg, #9a3412 0%, #ea580c 100%)" }}
+                >
                     <div>
-                        <h2 className="text-xl font-black uppercase italic">Compras</h2>
-                        <p className="text-amber-200 text-[10px] mt-1">**** **** **** {card.cardNumber?.slice(-4)}</p>
+                        <h2 className="text-2xl font-bold tracking-tight italic uppercase">Historial de Compras</h2>
+                        <p className="text-orange-100 text-xs opacity-90 uppercase font-black tracking-widest mt-1">
+                            Tarjeta: **** {card.cardNumber?.slice(-4)}
+                        </p>
                     </div>
-                    <button onClick={onClose} className="text-white text-2xl font-black">×</button>
+                    <button 
+                        onClick={onClose} 
+                        className="text-white hover:text-orange-200 transition-all hover:rotate-90 duration-300"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <div className="overflow-y-auto max-h-96">
+                {/* Resumen de Consumo */}
+                <div className="bg-orange-50/50 p-6 flex justify-between items-center border-b border-orange-100">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-orange-800/50 uppercase tracking-widest">Total de consumos</span>
+                        <span className="text-2xl font-black text-orange-700 italic">Q {totalAmount.toLocaleString('es-GT', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="bg-white px-4 py-2 rounded-2xl border border-orange-100 shadow-sm">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Transacciones: </span>
+                        <span className="text-sm font-black text-orange-600">{purchases.length}</span>
+                    </div>
+                </div>
+
+                {/* Listado de Compras */}
+                <div className="overflow-y-auto max-h-[50vh]">
                     {loading ? (
-                        <p className="text-center p-8 text-gray-400">Cargando...</p>
+                        <div className="flex flex-col items-center py-12 gap-3">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600"></div>
+                            <p className="text-orange-800/40 font-bold text-[10px] uppercase">Sincronizando movimientos...</p>
+                        </div>
                     ) : purchases.length === 0 ? (
-                        <p className="text-center p-8 text-gray-400 italic">Sin compras registradas</p>
+                        <div className="text-center py-20">
+                            <p className="text-gray-400 italic font-medium">No se registran movimientos en este período</p>
+                        </div>
                     ) : (
-                        <table className="w-full">
+                        <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b border-gray-100">
-                                    <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Descripción</th>
-                                    <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Comercio</th>
-                                    <th className="text-right p-4 text-[10px] font-black text-gray-400 uppercase">Monto</th>
-                                    <th className="text-right p-4 text-[10px] font-black text-gray-400 uppercase">Fecha</th>
+                                <tr className="bg-gray-50/50">
+                                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Establecimiento</th>
+                                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</th>
+                                    <th className="p-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Monto</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {purchases.map(p => (
-                                    <tr key={p._id} className="border-b border-gray-50 hover:bg-gray-50">
-                                        <td className="p-4 font-bold text-sm text-gray-800">{p.description}</td>
-                                        <td className="p-4 text-sm text-gray-500">{p.merchant}</td>
-                                        <td className="p-4 text-right font-black text-sm text-amber-600">Q {p.amount?.toLocaleString()}</td>
-                                        <td className="p-4 text-right text-sm text-gray-400">
-                                            {new Date(p.date).toLocaleDateString('es-GT')}
+                                    <tr key={p._id} className="border-b border-gray-50 hover:bg-orange-50/20 transition-colors group">
+                                        <td className="p-4">
+                                            <p className="font-black text-sm text-gray-800 uppercase tracking-tight">{p.merchant || 'Comercio Local'}</p>
+                                            <p className="text-[10px] text-gray-400 font-bold italic">{p.description}</p>
+                                        </td>
+                                        <td className="p-4">
+                                            <p className="text-xs font-bold text-gray-500">
+                                                {new Date(p.date).toLocaleDateString('es-GT', { day: '2-digit', month: 'short' })}
+                                            </p>
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <p className="font-black text-sm text-orange-600 group-hover:scale-110 transition-transform">
+                                                Q {p.amount?.toLocaleString()}
+                                            </p>
                                         </td>
                                     </tr>
                                 ))}
@@ -52,11 +95,11 @@ export const CardPurchasesModal = ({ isOpen, onClose, card }) => {
                     )}
                 </div>
 
-                <div className="p-4 border-t border-gray-100 flex justify-between items-center">
-                    <span className="text-[10px] font-black text-gray-400 uppercase">{purchases.length} compra(s)</span>
-                    <span className="font-black text-amber-600">
-                        Total: Q {purchases.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
-                    </span>
+                {/* Footer Institucional */}
+                <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex justify-center">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">
+                        Kinal Bank — Detalle de Movimientos
+                    </p>
                 </div>
             </div>
         </div>

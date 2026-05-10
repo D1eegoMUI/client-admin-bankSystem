@@ -24,30 +24,37 @@ export const CreditCardView = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {cards.map(card => (
-                    <div key={card._id} className="flex flex-col gap-2">
-                        <CreditCardItem card={card} />
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setPurchasesModal({ open: true, card })}
-                                className="flex-1 py-2 border-2 border-amber-500 text-amber-600 text-[10px] font-black rounded-xl uppercase hover:bg-amber-50 transition-colors"
-                            >
-                                Ver Compras
-                            </button>
-                            <button
-                                onClick={() => setPayModal({ open: true, card })}
-                                className="flex-1 py-2 bg-slate-800 text-white text-[10px] font-black rounded-xl uppercase hover:bg-slate-700 transition-colors"
-                            >
-                                Pagar Tarjeta
-                            </button>
-                            <button
-                                onClick={() => setFinancingModal({ open: true, card })}
-                                className="w-full py-2 border-2 border-blue-600 text-blue-600 text-[10px] font-black rounded-xl uppercase hover:bg-blue-50 transition-colors"
-                            >
-                                Extra Financiamientos
-                            </button>
-                        </div>
-                    </div>
-                ))}
+    <div key={card._id} className="flex flex-col gap-3 group">
+        <CreditCardItem card={card} />
+        
+        {/* Contenedor de Botones Organizado */}
+        <div className="flex flex-wrap gap-2">
+            {/* Fila Superior: 2 Botones */}
+            <div className="flex w-full gap-2">
+                <button
+                    onClick={() => setPurchasesModal({ open: true, card })}
+                    className="flex-1 py-3 border-2 border-emerald-100 text-emerald-700 text-[10px] font-black rounded-xl uppercase hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all active:scale-95 shadow-sm"
+                >
+                    Ver Compras
+                </button>
+                <button
+                    onClick={() => setPayModal({ open: true, card })}
+                    className="flex-1 py-3 bg-emerald-600 text-white text-[10px] font-black rounded-xl uppercase hover:bg-emerald-700 transition-all active:scale-95 shadow-md shadow-emerald-100"
+                >
+                    Pagar Tarjeta
+                </button>
+            </div>
+
+            {/* Fila Inferior: 1 Botón Ancho */}
+            <button
+                onClick={() => setFinancingModal({ open: true, card })}
+                className="w-full py-3 border-2 border-slate-800 text-slate-800 text-[10px] font-black rounded-xl uppercase hover:bg-slate-800 hover:text-white transition-all active:scale-95"
+            >
+                Extra Financiamientos
+            </button>
+        </div>
+    </div>
+))}
             </div>
 
             <CreditCardModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); getCreditCards(); }} />
