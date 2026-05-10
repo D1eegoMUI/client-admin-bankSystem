@@ -5,7 +5,7 @@ import * as api from "../../../shared/Api/admin";
 export const useUserStore = create((set, get) => ({
     users: [],
     pagination: {
-        currentPage: 1,
+        currentPage: 1,git 
         totalPages: 1,
         totalRecords: 0,
     },
