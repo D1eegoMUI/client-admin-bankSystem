@@ -102,6 +102,9 @@ export const getAccountHistory = async (id) =>
 export const revertDeposit = async (id) => 
     await axiosAdmin.put(`/transactions/revert/${id}`);
 
+export const getAllTransactions = async (params) =>
+    await axiosAdmin.get("/transactions/all", { params });
+
 // ================= CARDS (DÉBITO - Entidad: Card) =================
 export const getCards = async (params) => 
     await axiosAdmin.get("/cards", { params });

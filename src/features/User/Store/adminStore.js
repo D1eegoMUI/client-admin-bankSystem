@@ -619,3 +619,52 @@ export const useExtraFinancingStore = create((set, get) => ({
         }
     }
 }));
+// ================= TRANSACTION STORE =================
+export const useTransactionStore = create((set, get) => ({
+    transactions: [],
+    pagination: { total: 0, page: 1, totalPages: 1 },
+    loading: false,
+    error: null,
+
+    fetchAllTransactions: async (params) => {
+        try {
+            set({ loading: true, error: null });
+            const res = await api.getAllTransactions(params);
+            set({ transactions: res.data.data, pagination: res.data.pagination, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Error al cargar transacciones', loading: false });
+        }
+    },
+
+    createTransaction: async (data) => {      // ← nueva
+        try {
+            set({ loading: true, error: null });
+            const res = await api.createTransaction(data);
+            set(state => ({
+                transactions: [res.data.data?.transaccion, ...state.transactions].filter(Boolean),
+                loading: false
+            }));
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Error al crear transacción', loading: false });
+            throw error;
+        }
+    },
+
+    revertDeposit: async (id) => {
+        try {
+            set({ loading: true, error: null });
+            const res = await api.revertDeposit(id);
+            set(state => ({
+                transactions: state.transactions.map(tx =>
+                    tx._id === id ? { ...tx, status: 'REVERTED' } : tx
+                ),
+                loading: false
+            }));
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Error al revertir', loading: false });
+            throw error;
+        }
+    }
+}));
