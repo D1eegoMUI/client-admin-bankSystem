@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useSaveCard } from "../hooks/useSaveCard";
 import { useAccountStore } from "../../User/Store/adminStore";
 import { SearchableSelect } from "../../../shared/components/ui/SearchableSelect";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 
 export const CardModal = ({ isOpen, onClose, cardData = null }) => {
     const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
@@ -32,8 +33,10 @@ export const CardModal = ({ isOpen, onClose, cardData = null }) => {
 
             await saveCardData({ ...data, user: finalUserId });
             onClose();
+            showSuccess("Tarjeta de débito emitida con éxito");
         } catch (error) {
             console.error("Error al emitir tarjeta de débito:", error);
+            showError("Error al emitir tarjeta de débito");
         }
     };
 

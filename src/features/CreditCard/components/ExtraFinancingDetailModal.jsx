@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useExtraFinancingStore, useAccountStore } from "../../User/Store/adminStore";
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
     const { details, getDetails, payInstallment, loading } = useExtraFinancingStore();
@@ -22,8 +24,10 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
             setPaying(true);
             await payInstallment({ extraFinancingId: financing._id, accountId: selectedAccount });
             await getDetails(financing._id);
+            showSuccess("Cuota pagada con éxito");
         } catch (e) {
             console.error("Error al pagar cuota:", e);
+            showError("Error al pagar cuota");
         } finally {
             setPaying(false);
         }

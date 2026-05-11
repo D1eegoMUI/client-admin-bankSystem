@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check, X, User, AlertCircle } from 'lucide-react';
 import { useLoanAppStore } from '../../User/Store/adminStore';
+import { showSuccess, showError } from '../../../shared/utils/toast.js';
 
 export const ApplicationStatusCard = ({ app, isAdmin }) => {
     const { processApplication, loading } = useLoanAppStore();
@@ -19,6 +20,20 @@ export const ApplicationStatusCard = ({ app, isAdmin }) => {
     const applicantName = app.applicant
         ? `${app.applicant.UserName ?? ''} ${app.applicant.UserSurname ?? ''}`.trim()
         : `Solicitud #${app._id?.slice(-6)}`;
+
+    const handleProcess = async (action) => {
+        try {
+            await processApplication(app._id, action);
+            const messages = {
+                APPROVE: 'Solicitud aprobada exitosamente',
+                REJECT:  'Solicitud rechazada',
+                CANCEL:  'Solicitud cancelada',
+            };
+            showSuccess(messages[action]);
+        } catch (error) {
+            showError(error.response?.data?.message || 'Error al procesar la solicitud');
+        }
+    };
 
     return (
         <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm hover:border-emerald-200 transition-all flex flex-col h-full">
@@ -61,14 +76,14 @@ export const ApplicationStatusCard = ({ app, isAdmin }) => {
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             disabled={loading}
-                            onClick={() => processApplication(app._id, 'APPROVE')}
+                            onClick={() => handleProcess('APPROVE')}
                             className="flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl font-black text-[10px] uppercase hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all disabled:opacity-50"
                         >
                             <Check size={16} /> Aprobar
                         </button>
                         <button
                             disabled={loading}
-                            onClick={() => processApplication(app._id, 'REJECT')}
+                            onClick={() => handleProcess('REJECT')}
                             className="flex items-center justify-center gap-2 py-3 bg-white border-2 border-red-100 text-red-600 rounded-xl font-black text-[10px] uppercase hover:bg-red-50 transition-all disabled:opacity-50"
                         >
                             <X size={16} /> Rechazar
@@ -79,7 +94,7 @@ export const ApplicationStatusCard = ({ app, isAdmin }) => {
 
             {!isAdmin && app.status === 'PENDING' && (
                 <button
-                    onClick={() => processApplication(app._id, 'CANCEL')}
+                    onClick={() => handleProcess('CANCEL')}
                     className="w-full mt-auto py-3 text-[10px] font-black text-red-400 hover:bg-red-50 rounded-xl uppercase tracking-widest transition-colors"
                 >
                     Cancelar Solicitud

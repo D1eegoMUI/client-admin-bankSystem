@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { User, AlertTriangle, ChevronDown, ChevronUp, CreditCard, X, CheckCircle2 } from 'lucide-react';
 import { useLoanStore, useAccountStore } from '../../User/Store/adminStore';
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const LoanCard = ({ loan, isAdmin }) => {
     const paidAmount = loan.amount - loan.remainingBalance;
@@ -35,6 +37,7 @@ export const LoanCard = ({ loan, isAdmin }) => {
                 setLoanDetails(res.data.data);
             } catch (e) {
                 console.error(e);
+                showError("Error al cargar los detalles del préstamo");
             } finally {
                 setLoadingDetails(false);
             }
@@ -58,6 +61,7 @@ export const LoanCard = ({ loan, isAdmin }) => {
             if (showDetails) setLoanDetails(res.data.data);
         } catch (e) {
             console.error(e);
+            showError("Error al cargar los detalles del préstamo");
         } finally {
             setLoadingInstallment(false);
         }
@@ -68,6 +72,7 @@ export const LoanCard = ({ loan, isAdmin }) => {
         try {
             const res = await payLoanInstallment(loan._id, selectedAccount);
             setPayResult({ success: true, message: res.message });
+            showSuccess("Cuota pagada con éxito");
             // Refrescar cuotas locales si la tabla está abierta
             if (showDetails) {
                 const updated = await api.getLoanDetails(loan._id);
@@ -210,9 +215,7 @@ export const LoanCard = ({ loan, isAdmin }) => {
             {/* Modal de pago */}
             {showPayModal && (
                 <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-50 px-3">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-emerald-100">
-
-                        {/* ✅ Header */}
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-emerald-100">                        {/* ✅ Header */}
                         <div className="p-6 text-white flex justify-between items-center" style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}>
                             <div>
                                 <h2 className="text-xl font-bold">Pagar Cuota</h2>

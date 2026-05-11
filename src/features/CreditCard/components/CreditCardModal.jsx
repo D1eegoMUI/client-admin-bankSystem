@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useCardStore, useUserStore } from "../../User/Store/adminStore";
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const CreditCardModal = ({ isOpen, onClose }) => {
     const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
@@ -23,9 +25,11 @@ export const CreditCardModal = ({ isOpen, onClose }) => {
                 type: data.type,
                 creditLimit: Number(data.creditLimit)
             });
+            showSuccess("Tarjeta de crédito emitida con éxito");
             reset();
             onClose();
         } catch (e) {
+            showError("Error al emitir tarjeta de crédito");
             console.error("Error al emitir crédito:", e);
         }
     };

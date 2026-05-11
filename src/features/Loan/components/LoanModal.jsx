@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLoanStore, useAccountStore, useUserStore } from '../../User/Store/adminStore';
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const LoanModal = ({ onClose }) => {
     const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
@@ -47,8 +49,10 @@ export const LoanModal = ({ onClose }) => {
                 termMonths: Number(data.termMonths),
                 interestRate: Number(data.interestRate),
             });
+            showSuccess("Préstamo creado con éxito");
             onClose();
         } catch (e) {
+            showError("Error al crear préstamo");
             console.error("Error al crear préstamo:", e);
         }
     };

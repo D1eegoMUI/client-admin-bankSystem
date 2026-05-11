@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLoanAppStore, useAccountStore } from '../../User/Store/adminStore';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const ApplicationModal = ({ onClose }) => {
     const { register, handleSubmit, watch, formState: { errors } } = useForm({
@@ -35,8 +37,10 @@ export const ApplicationModal = ({ onClose }) => {
                 interestRate: Number(data.interestRate),
                 monthlyIncome: Number(data.monthlyIncome),
             });
+            showSuccess("Solicitud de préstamo enviada con éxito");
             onClose();
         } catch (e) {
+            showError("Error al enviar solicitud");
             console.error('Error al enviar solicitud:', e);
         }
     };

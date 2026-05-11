@@ -80,10 +80,8 @@ export const useUserStore = create((set, get) => ({
                 loading: false
             });
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al cambiar estado",
-                loading: false
-            });
+            set({ error: error.response?.data?.message || "Error al cambiar estado", loading: false });
+            throw error;
         }
     },
 
@@ -154,10 +152,8 @@ export const useAccountStore = create((set, get) => ({
                 accounts: get().accounts.map(a => a._id === id ? res.data.account : a), loading: false
             });
         } catch (error) {
-            set({
-                error: error.response?.data?.message || "Error al cambiar estado de cuenta",
-                loading: false
-            });
+            set({ error: error.response?.data?.message || "Error al cambiar estado de cuenta", loading: false });
+            throw error;
         }
     },
 

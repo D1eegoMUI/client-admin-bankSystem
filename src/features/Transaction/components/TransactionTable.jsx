@@ -1,4 +1,6 @@
 import { ArrowRight, RotateCcw } from 'lucide-react';
+import { showConfirmToast } from '../../auth/components/ConfirmModal.jsx';
+import { showSuccess, showError } from '../../../shared/utils/toast.js';
 
 const STATUS_STYLES = {
     COMPLETED: 'bg-emerald-50 text-emerald-700',
@@ -17,13 +19,19 @@ const TYPE_LABELS = {
 };
 
 export const TransactionTable = ({ transactions, onRevert }) => {
-    const handleRevert = async (tx) => {
-        if (!window.confirm(`¿Revertir el depósito ${tx._id}? Solo es posible dentro del primer minuto.`)) return;
-        try {
-            await onRevert(tx._id);
-        } catch (e) {
-            alert(e?.response?.data?.message || 'No se pudo revertir');
-        }
+    const handleRevert = (tx) => {
+        showConfirmToast({
+            title: 'Revertir Depósito',
+            message: `¿Seguro que deseas revertir el depósito #${tx._id.slice(-8).toUpperCase()}? Esta acción solo es posible dentro del primer minuto.`,
+            onConfirm: async () => {
+                try {
+                    await onRevert(tx._id);
+                    showSuccess('Depósito revertido exitosamente');
+                } catch (e) {
+                    showError(e?.response?.data?.message || 'No se pudo revertir el depósito');
+                }
+            }
+        });
     };
 
     return (

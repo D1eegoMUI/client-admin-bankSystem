@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAccountStore } from "../../User/Store/adminStore";
 import { AccountDetailModal } from './AccountDetailModal.jsx';
+import { showSuccess, showError } from '../../../shared/utils/toast.js';
 
 export const AccountList = ({ onAddClick }) => {
     const { accounts, getAccounts, toggleAccountStatus, loading } = useAccountStore();
@@ -9,6 +10,15 @@ export const AccountList = ({ onAddClick }) => {
     const [search, setSearch] = useState('');
     const [filterType, setFilterType] = useState('TODAS');   // TODAS | AHORRO | MONETARIA
     const [filterStatus, setFilterStatus] = useState('TODAS'); // TODAS | ACTIVA | INACTIVA
+
+    const handleToggleAccount = async (id, currentStatus) => {
+        try {
+            await toggleAccountStatus(id);
+            showSuccess(currentStatus ? 'Cuenta desactivada' : 'Cuenta activada');
+        } catch (error) {
+            showError(error.response?.data?.message || 'Error al cambiar estado de cuenta');
+        }
+    };
 
     useEffect(() => {
         getAccounts();
@@ -77,11 +87,10 @@ export const AccountList = ({ onAddClick }) => {
                         <button
                             key={opt}
                             onClick={() => setFilterType(opt)}
-                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                                filterType === opt
+                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${filterType === opt
                                     ? 'bg-emerald-600 text-white border-emerald-600'
                                     : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
-                            }`}
+                                }`}
                         >
                             {opt}
                         </button>
@@ -94,15 +103,14 @@ export const AccountList = ({ onAddClick }) => {
                         <button
                             key={opt}
                             onClick={() => setFilterStatus(opt)}
-                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                                filterStatus === opt
+                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${filterStatus === opt
                                     ? opt === 'ACTIVA'
                                         ? 'bg-emerald-500 text-white border-emerald-500'
                                         : opt === 'INACTIVA'
                                             ? 'bg-red-400 text-white border-red-400'
                                             : 'bg-emerald-600 text-white border-emerald-600'
                                     : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
-                            }`}
+                                }`}
                         >
                             {opt}
                         </button>
@@ -163,7 +171,7 @@ export const AccountList = ({ onAddClick }) => {
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => toggleAccountStatus(account._id)}
+                                        onClick={() => handleToggleAccount(account._id, account.status)}
                                         className="py-2.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 text-sm font-bold rounded-xl transition-colors border border-yellow-100"
                                     >
                                         {account.status ? 'Desactivar' : 'Activar'}

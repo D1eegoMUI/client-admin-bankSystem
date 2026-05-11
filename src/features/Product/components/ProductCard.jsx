@@ -1,10 +1,16 @@
 import { useProductStore } from '../../User/Store/adminStore';
+import { showSuccess, showError } from '../../../shared/utils/toast.js'; 
 
 export const ProductCard = ({ product, onEdit, onDelete }) => {
     const { updateProduct, loading } = useProductStore();
 
     const handleToggleStatus = async () => {
-        await updateProduct(product._id, { isActive: !product.isActive });
+        try {
+            await updateProduct(product._id, { isActive: !product.isActive });
+            showSuccess(product.isActive ? 'Producto desactivado' : 'Producto activado');
+        } catch (error) {
+            showError(error.response?.data?.message || 'Error al cambiar estado');
+        }
     };
 
     const handleDelete = () => {
@@ -16,11 +22,10 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col group">
             <div className="p-6 flex-1">
                 <div className="flex justify-between items-start mb-4">
-                    <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border ${
-                        product.type === 'PRODUCTO'
+                    <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border ${product.type === 'PRODUCTO'
                             ? 'bg-blue-50 text-blue-600 border-blue-100'
                             : 'bg-purple-50 text-purple-600 border-purple-100'
-                    }`}>
+                        }`}>
                         {product.type}
                     </span>
                     <span className={`text-[10px] font-bold ${product.isActive ? 'text-emerald-500' : 'text-red-400'}`}>
@@ -58,11 +63,10 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
                     <button
                         onClick={handleToggleStatus}
                         disabled={loading}
-                        className={`py-2 px-4 text-xs font-bold rounded-xl transition-colors border ${
-                            product.isActive
+                        className={`py-2 px-4 text-xs font-bold rounded-xl transition-colors border ${product.isActive
                                 ? 'bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border-yellow-100'
                                 : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-100'
-                        }`}
+                            }`}
                     >
                         {product.isActive ? 'Desactivar' : 'Activar'}
                     </button>

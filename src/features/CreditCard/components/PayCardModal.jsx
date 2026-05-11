@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAccountStore, useCreditCardPaymentStore } from "../../User/Store/adminStore";
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 
 export const PayCardModal = ({ isOpen, onClose, card }) => {
     const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
@@ -23,9 +24,11 @@ export const PayCardModal = ({ isOpen, onClose, card }) => {
                 accountId: data.accountId,
                 amount: Number(data.amount)
             });
+            showSuccess("Pago realizado con éxito");
             onClose();
         } catch (e) {
             console.error("Error al pagar tarjeta:", e);
+            showError("Error al pagar tarjeta");
         }
     };
 

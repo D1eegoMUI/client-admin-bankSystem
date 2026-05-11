@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useExtraFinancingStore } from "../../User/Store/adminStore";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
 
 export const ExtraFinancingModal = ({ isOpen, onClose, card }) => {
     const { register, handleSubmit, reset, formState: { errors } } = useForm({ 
@@ -21,9 +22,11 @@ export const ExtraFinancingModal = ({ isOpen, onClose, card }) => {
                 installments: Number(data.installments),
                 interestRate: Number(data.interestRate)
             });
+            showSuccess("Financiamiento creado con éxito");
             onClose();
         } catch (e) {
             console.error("Error al crear financiamiento:", e);
+            showError("Error al crear financiamiento");
         }
     };
 

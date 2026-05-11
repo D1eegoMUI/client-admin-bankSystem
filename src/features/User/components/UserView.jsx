@@ -4,6 +4,7 @@ import { UserModal } from './UserModal.jsx';
 import { useUserStore } from '../Store/adminStore.js';
 import { Spinner } from '../../auth/components/Spinner.jsx';
 import { UserVerifyModal } from './UserVerifyModal.jsx';
+import { showSuccess, showError } from '../../../shared/utils/toast.js';
 
 export const UsersView = () => {
     const [showModal, setShowModal] = useState(false);
@@ -32,6 +33,15 @@ export const UsersView = () => {
     const handleCloseModal = () => {
         setSelectedUser(null);
         setShowModal(false);
+    };
+
+    const handleToggleStatus = async (uid, currentStatus) => {
+        try {
+            await toggleUserStatus(uid);
+            showSuccess(currentStatus === 'ACTIVE' ? 'Usuario desactivado' : 'Usuario activado');
+        } catch (error) {
+            showError(error.response?.data?.message || 'Error al cambiar estado');
+        }
     };
 
     // Filtrado en tiempo real
@@ -100,7 +110,7 @@ export const UsersView = () => {
                                     key={user.uid}
                                     user={user}
                                     onEdit={handleEditUser}
-                                    onToggleStatus={() => toggleUserStatus(user.uid)}
+                                    onToggleStatus={() => handleToggleStatus(user.uid, user.UserStatus)}
                                     onVerify={() => setUserToVerify(user)}   // ← nuevo
                                 />
                             ))

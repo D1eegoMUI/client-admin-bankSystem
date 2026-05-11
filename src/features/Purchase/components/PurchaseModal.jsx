@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { usePurchaseStore } from "../../User/Store/adminStore";
 import { useCardStore, useAccountStore } from "../../User/Store/adminStore";
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const PurchaseModal = ({ isOpen, onClose }) => {
     const { register, handleSubmit, reset, watch } = useForm({ defaultValues: { type: 'CREDIT' } });
@@ -28,9 +30,11 @@ export const PurchaseModal = ({ isOpen, onClose }) => {
                 cardId: data.cardId,
                 merchant: data.merchant || 'Comercio Local'
             });
+            showSuccess("Compra registrada con éxito");
             onClose();
         } catch (e) {
             console.error("Error al registrar compra:", e);
+            showError("Error al registrar compra");
         }
     };
 

@@ -3,6 +3,8 @@ import { X, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { useTransactionStore } from '../../User/Store/adminStore';
 import { useAccountStore } from '../../User/Store/adminStore';
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 const CURRENCIES = ['GTQ', 'USD', 'EUR', 'MXN'];
 
@@ -35,9 +37,11 @@ export const TransactionModal = ({ onClose }) => {
         }
         try {
             const res = await createTransaction({ ...form, type, amount: Number(form.amount) });
+            showSuccess("Transacción registrada con éxito");
             setResult({ success: true, message: `${type === 'DEPOSIT' ? 'Depósito' : 'Retiro'} registrado exitosamente. Nuevo saldo: Q${res.data?.nuevoSaldoOrigen?.toLocaleString('en-US', { minimumFractionDigits: 2 })}` });
             setForm({ AccountOriginId: '', amount: '', currency: 'GTQ', description: '' });
         } catch (e) {
+            showError("Error al procesar la transacción");
             setResult({ success: false, message: e?.response?.data?.message || 'Error al procesar la transacción.' });
         }
     };

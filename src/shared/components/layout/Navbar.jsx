@@ -3,7 +3,7 @@ import imgLogo from "../../../assets/img/Kinal_bank.png";
 const Navbar = () => {
     return (
         <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div className="max-w-7xl px-6 h-16 flex items-center justify-between">
 
                 {/* Logo + título institucional */}
                 <div className="flex items-center gap-3">

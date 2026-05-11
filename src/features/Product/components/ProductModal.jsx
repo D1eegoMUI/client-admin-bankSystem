@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useProductStore } from '../../User/Store/adminStore';
+import { showSuccess, showError } from "../../../shared/utils/toast.js";
+
 
 export const ProductModal = ({ product, onClose }) => {
     const { createProduct, updateProduct, loading } = useProductStore();
@@ -38,9 +40,9 @@ export const ProductModal = ({ product, onClose }) => {
             } else {
                 await createProduct(form);
             }
-            onClose();
+            showSuccess(isEditing ? "Producto actualizado con éxito" : "Producto creado con éxito"); onClose();
         } catch (e) {
-            alert(e?.response?.data?.message || 'Error al guardar');
+            showError("Error al guardar");
         }
     };
 
@@ -138,4 +140,4 @@ export const ProductModal = ({ product, onClose }) => {
             </div>
         </div>
     );
-};
+}

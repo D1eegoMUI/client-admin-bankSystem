@@ -2,6 +2,7 @@ import { useAuthStore } from "../store/authStore.js";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { showSuccess } from "../../../shared/utils/toast.js";
 
 const LoginForm = ({ onForgot }) => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const LoginForm = ({ onForgot }) => {
         const res = await login(data);
         if (res.success) {
             navigate("/dashboard");
-            toast.success("¡Bienvenido de nuevo!");
+            showSuccess("¡Bienvenido de nuevo!");
         }
     };
 
