@@ -5,7 +5,7 @@ import * as api from "../../../shared/Api/admin";
 export const useUserStore = create((set, get) => ({
     users: [],
     pagination: {
-        currentPage: 1,git 
+        currentPage: 1, 
         totalPages: 1,
         totalRecords: 0,
     },
@@ -136,8 +136,7 @@ export const useAccountStore = create((set, get) => ({
             set({ loading: true, error: null });
             const res = await api.changeAccountStatus(id);
             set({
-                accounts: get().accounts.map(a => a._id === id ? res.data.data : a),
-                loading: false
+                accounts: get().accounts.map(a => a._id === id ? res.data.account : a),                 loading: false
             });
         } catch (error) {
             set({
