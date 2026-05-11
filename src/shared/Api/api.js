@@ -1,4 +1,5 @@
 import axios from "axios";
+<<<<<<< HEAD
 import { useAuthStore } from "../../features/auth/store/authStore.js";
 
 const AUTH_STORE_KEY = "auth-store";
@@ -33,6 +34,10 @@ const attachAuthToken = (config, token) => {
     config.headers.Authorization = `Bearer ${token}`;
     return config;
 };
+=======
+
+import { useAuthStore } from "../../features/auth/store/authStore.js";
+>>>>>>> ft/DiegoLopez
 
 // ================= INSTANCIAS AXIOS =================
 const axiosAuth = axios.create({
@@ -44,25 +49,52 @@ const axiosAuth = axios.create({
 });
 
 const axiosAdmin = axios.create({
+<<<<<<< HEAD
     baseURL: import.meta.env.VITE_ADMIN_URL, 
+=======
+    baseURL: import.meta.env.VITE_ADMIN_URL, // Debe ser http://localhost:3001/restaurantSystem/v1
+>>>>>>> ft/DiegoLopez
     timeout: 8000,
     headers: { 'Content-Type': 'application/json' },
 });
 
+<<<<<<< HEAD
 // configuracion de interceptores de PETICIÓN
 axiosAuth.interceptors.request.use((config) => {
     config._axiosClient = "auth";
     const token = useAuthStore.getState().token || getStoredToken();
     return attachAuthToken(config, token);
+=======
+// configuracion de interceptores
+axiosAuth.interceptors.request.use( (config) => {
+    config._axiosClient = "auth";
+
+    const token = useAuthStore.getState().token;
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+>>>>>>> ft/DiegoLopez
 });
 
 axiosAdmin.interceptors.request.use((config) => {
     config._axiosClient = "admin";
+<<<<<<< HEAD
     const token = useAuthStore.getState().token || getStoredToken();
     return attachAuthToken(config, token);
 });
 
 // configuración de regeneración de token
+=======
+    const token = useAuthStore.getState().token;
+    if (token) config.headers.Authorization = `Bearer ${token}`; // Node espera Bearer token ahora
+    return config;
+});
+
+// configuración de documentación axios
+>>>>>>> ft/DiegoLopez
 let _isRefreshing = false;
 let failedQueue = [];
  

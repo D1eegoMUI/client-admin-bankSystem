@@ -174,3 +174,4 @@ export const getExtraFinancingDetails = async (financingId) =>
 
 export const payExtraFinancingInstallment = async (data) =>
     await axiosAdmin.post("/extraFinancingPayments/pay", data);
+    await axiosAdmin.put(`/users/${id}/status`);
