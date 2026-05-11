@@ -1,4 +1,4 @@
-import { useUserStore } from "../store/adminStore.js";
+import { useUserStore } from "../Store/adminStore.js";
 
 export const useSaveUser = () => {
   const createUser = useUserStore((state) => state.createUser);

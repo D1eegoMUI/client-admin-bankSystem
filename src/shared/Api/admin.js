@@ -16,6 +16,9 @@ export const updateUser = async (id, data) =>
 export const changeUserStatus = async (id) => 
     await axiosAdmin.put(`/users/${id}/status`);
 
+export const verifyUser = async (id) =>
+    await axiosAdmin.put(`/users/${id}/verify`);
+
 // ================= ACCOUNTS =================
 export const getAccounts = async () => 
     await axiosAdmin.get("/accounts");
@@ -174,4 +177,3 @@ export const getExtraFinancingDetails = async (financingId) =>
 
 export const payExtraFinancingInstallment = async (data) =>
     await axiosAdmin.post("/extraFinancingPayments/pay", data);
-    await axiosAdmin.put(`/users/${id}/status`);

@@ -5,7 +5,7 @@ import * as api from "../../../shared/Api/admin";
 export const useUserStore = create((set, get) => ({
     users: [],
     pagination: {
-        currentPage: 1, 
+        currentPage: 1,
         totalPages: 1,
         totalRecords: 0,
     },
@@ -86,6 +86,21 @@ export const useUserStore = create((set, get) => ({
             });
         }
     },
+
+    verifyUser: async (id) => {
+        try {
+            set({ loading: true, error: null });
+            const res = await api.verifyUser(id);
+            set({
+                users: get().users.map(u => u.uid === id ? { ...u, isVerified: true } : u),
+                loading: false
+            });
+            return res.data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Error al verificar usuario', loading: false });
+            throw error;
+        }
+    },
 }));
 
 // ================= ACCOUNTS =================
@@ -136,7 +151,7 @@ export const useAccountStore = create((set, get) => ({
             set({ loading: true, error: null });
             const res = await api.changeAccountStatus(id);
             set({
-                accounts: get().accounts.map(a => a._id === id ? res.data.account : a),                 loading: false
+                accounts: get().accounts.map(a => a._id === id ? res.data.account : a), loading: false
             });
         } catch (error) {
             set({

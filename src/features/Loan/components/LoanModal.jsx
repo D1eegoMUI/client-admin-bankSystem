@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLoanStore, useAccountStore, useUserStore } from '../../User/Store/adminStore';
 import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect';
@@ -6,8 +6,14 @@ import { SearchableSelect } from '../../../shared/components/ui/SearchableSelect
 export const LoanModal = ({ onClose }) => {
     const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
         defaultValues: { interestRate: 12, termMonths: 12 }
-    }); const borrowerValue = watch('borrower', '');
+    });
+
+    const borrowerValue = watch('borrower', '');
     const accountValue = watch('account', '');
+    const amount = watch('amount');
+    const termMonths = watch('termMonths');
+    const interestRate = watch('interestRate');
+
     const { createLoan, loading } = useLoanStore();
     const { accounts, getAccounts } = useAccountStore();
     const { users, getUsers } = useUserStore();
@@ -17,9 +23,15 @@ export const LoanModal = ({ onClose }) => {
         getUsers({});
     }, []);
 
-    const amount = watch('amount');
-    const termMonths = watch('termMonths');
-    const interestRate = watch('interestRate');
+    // Limpiar cuenta al cambiar usuario
+    useEffect(() => {
+        setValue('account', '');
+    }, [borrowerValue]);
+
+    const filteredAccounts = accounts.filter(a => {
+        const accountUserId = a.user?._id || a.user?.uid || a.user;
+        return accountUserId === borrowerValue;
+    });
 
     const monthlyRate = (Number(interestRate) / 100) / 12;
     const estimatedQuota = amount && termMonths && monthlyRate > 0
@@ -70,14 +82,21 @@ export const LoanModal = ({ onClose }) => {
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-xs font-black text-gray-400 uppercase mb-1">Cuenta para acreditar fondos</label>
                             <SearchableSelect
-                                options={accounts.map(a => ({
+                                options={filteredAccounts.map(a => ({
                                     value: a._id,
                                     label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
                                 }))}
                                 value={accountValue}
                                 onChange={val => setValue('account', val)}
-                                placeholder="Buscar número de cuenta..."
+                                placeholder={
+                                    !borrowerValue
+                                        ? "Primero selecciona un cliente"
+                                        : filteredAccounts.length === 0
+                                            ? "Sin cuentas disponibles"
+                                            : "Buscar número de cuenta..."
+                                }
                             />
+                            {!borrowerValue && <p className="text-[10px] text-amber-500 mt-1">Selecciona un cliente para ver sus cuentas disponibles</p>}
                             {errors.account && <span className="text-red-500 text-[10px] mt-1">Campo requerido</span>}
                         </div>
 

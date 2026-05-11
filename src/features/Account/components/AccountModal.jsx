@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAccountStore, useUserStore } from "../../User/Store/adminStore";
 import { showSuccess, showError } from "../../../shared/utils/toast"; // Ajusta la ruta si es necesario
+import { SearchableSelect } from "../../../shared/components/ui/SearchableSelect";
 
 const localUsersFallback = [
     {
@@ -67,9 +68,9 @@ export const AccountModal = ({ onClose }) => {
 
                         <div className="flex flex-col">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Tipo de Cuenta</label>
-                            <select 
+                            <select
                                 value={formData.accountType}
-                                onChange={(e) => setFormData({...formData, accountType: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none"
                             >
                                 <option value="AHORRO">Ahorro</option>
@@ -79,9 +80,9 @@ export const AccountModal = ({ onClose }) => {
 
                         <div className="flex flex-col">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Divisa</label>
-                            <select 
+                            <select
                                 value={formData.currency}
-                                onChange={(e) => setFormData({...formData, currency: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none"
                             >
                                 <option value="GTQ">Quetzal (GTQ)</option>
@@ -96,7 +97,7 @@ export const AccountModal = ({ onClose }) => {
                             <input
                                 type="number"
                                 value={formData.balance}
-                                onChange={(e) => setFormData({...formData, balance: Number(e.target.value)})}
+                                onChange={(e) => setFormData({ ...formData, balance: Number(e.target.value) })}
                                 className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none font-mono"
                                 placeholder="0.00"
                             />
@@ -104,27 +105,21 @@ export const AccountModal = ({ onClose }) => {
 
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-sm font-bold text-emerald-900 mb-1">Propietario</label>
-                            <select
-                                required
-                                value={formData.user}
-                                onChange={(e) => setFormData({ ...formData, user: e.target.value })}
-                                className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 transition-all outline-none bg-white"
-                            >
-                                <option value="" disabled>
-                                    {loadingUsers ? 'Cargando usuarios...' : 'Selecciona un usuario'}
-                                </option>
-                                {availableUsers.map((user) => {
-                                    const id = user.uid || user._id || user.id || '';
-                                    const label = user.UserName
-                                        ? `${user.UserName} ${user.UserSurname || ''}`
-                                        : user.UserEmail || id;
-                                    return (
-                                        <option key={id} value={id}>
-                                            {label} - {id}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                            {loadingUsers ? (
+                                <div className="px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-400 text-sm">
+                                    Cargando usuarios...
+                                </div>
+                            ) : (
+                                <SearchableSelect
+                                    options={users.map(u => ({
+                                        value: u.uid || u._id || '',
+                                        label: `${u.UserName} ${u.UserSurname} — ${u.UserEmail}`
+                                    }))}
+                                    value={formData.user}
+                                    onChange={(val) => setFormData({ ...formData, user: val })}
+                                    placeholder="Buscar usuario..."
+                                />
+                            )}
                             {availableUsers.length === 0 && !loadingUsers && (
                                 <p className="mt-2 text-xs text-gray-500">No hay usuarios disponibles.</p>
                             )}

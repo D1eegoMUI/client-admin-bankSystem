@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { useSaveUser } from "../hook/useSaveHook.js";
-import { useUserStore } from "../store/adminStore.js";
+import { useUserStore } from "../Store/adminStore.js";
 import { Spinner } from "../../auth/components/Spinner.jsx";
 import { showSuccess, showError } from "../../../shared/utils/toast.js";
 import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
@@ -73,7 +73,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
     return (
         <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-50 px-3">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-emerald-100">
-                
+
                 {/* HEADER */}
                 <div className="p-6 text-white flex justify-between items-center" style={{ background: "linear-gradient(90deg, #064e3b 0%, #059669 100%)" }}>
                     <div>
@@ -91,8 +91,28 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input {...register("UserName", { required: "Campo obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Nombres" />
                                 <input {...register("UserSurname", { required: "Campo obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Apellidos" />
-                                <input {...register("UserDPI", { required: "Campo obligatorio" })} disabled={!!user} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none disabled:bg-gray-50" placeholder="DPI (CUI)" />
-                                <input {...register("UserEmail", { required: "Email obligatorio" })} type="email" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Correo Electrónico" />
+                                <input
+                                    {...register("UserDPI", {
+                                        required: "El DPI es obligatorio",
+                                        pattern: { value: /^\d{13}$/, message: "El DPI debe tener exactamente 13 dígitos numéricos" }
+                                    })}
+                                    disabled={!!user}
+                                    type="text"
+                                    maxLength={13}
+                                    className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none disabled:bg-gray-50"
+                                    placeholder="DPI (CUI)"
+                                />
+                                {errors.UserDPI && <p className="text-red-500 text-[10px] mt-1">{errors.UserDPI.message}</p>}
+                                <input
+                                    {...register("UserEmail", {
+                                        required: "El correo es obligatorio",
+                                        pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Formato de correo inválido" }
+                                    })}
+                                    type="email"
+                                    className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none"
+                                    placeholder="Correo Electrónico"
+                                />
+                                {errors.UserEmail && <p className="text-red-500 text-[10px] mt-1">{errors.UserEmail.message}</p>}
                             </div>
                         </div>
 
@@ -101,8 +121,17 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                             <h3 className="text-xs font-black text-emerald-600 uppercase tracking-widest mb-4 border-b border-emerald-50 pb-1">Perfil Socioeconómico</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input {...register("UserAddress", { required: "Obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none md:col-span-2" placeholder="Dirección de Residencia" />
-                                <input {...register("UserPhone", { required: "Obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Celular / Teléfono" />
-                                <input {...register("UserJob", { required: "Obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Ocupación / Trabajo" />
+                                <input
+                                    {...register("UserPhone", {
+                                        required: "El teléfono es obligatorio",
+                                        pattern: { value: /^\d{8}$/, message: "El teléfono debe tener exactamente 8 dígitos" }
+                                    })}
+                                    type="text"
+                                    maxLength={8}
+                                    className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none"
+                                    placeholder="Celular / Teléfono"
+                                />
+                                {errors.UserPhone && <p className="text-red-500 text-[10px] mt-1">{errors.UserPhone.message}</p>}                                <input {...register("UserJob", { required: "Obligatorio" })} type="text" className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Ocupación / Trabajo" />
                                 <div className="relative">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-bold">Q</span>
                                     <input {...register("UserIncome", { required: "Obligatorio" })} type="number" className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none" placeholder="Ingresos Mensuales" />

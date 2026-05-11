@@ -1,6 +1,7 @@
 import React from 'react';
+import { useUserStore } from '../Store/adminStore.js';
 
-export const UserCard = ({ user, onEdit, onToggleStatus }) => {
+export const UserCard = ({ user, onEdit, onToggleStatus, onVerify }) => {
     return (
         <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all group">
             <div className="flex items-center gap-4 mb-4">
@@ -47,8 +48,11 @@ export const UserCard = ({ user, onEdit, onToggleStatus }) => {
                 {user.isVerified ? (
                     <span className="p-2 bg-emerald-500 text-white rounded-xl shadow-md flex items-center justify-center w-9 h-9" title="Usuario Verificado">✓</span>
                 ) : (
-                    <button className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 w-9 h-9 flex items-center justify-center" title="Pendiente de Verificación">!</button>
-                )}
+                    <button
+                        onClick={() => onVerify(user)}   
+                        className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 w-9 h-9 flex items-center justify-center"
+                        title="Pendiente de Verificación"
+                    >!</button>)}
             </div>
         </div>
     );

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { UserCard } from './UserCard.jsx';
 import { UserModal } from './UserModal.jsx';
-import { useUserStore } from '../store/adminStore.js';
+import { useUserStore } from '../Store/adminStore.js';
 import { Spinner } from '../../auth/components/Spinner.jsx';
+import { UserVerifyModal } from './UserVerifyModal.jsx';
 
 export const UsersView = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    
+    const [userToVerify, setUserToVerify] = useState(null);
+
     // Extraemos todo directamente del store de Zustand
     const { users, loading, getUsers, toggleUserStatus } = useUserStore();
 
@@ -33,11 +35,11 @@ export const UsersView = () => {
     };
 
     // Filtrado en tiempo real
-    const filteredUsers = users.filter(user => 
-        user.UserName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.UserSurname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.UserDPI.includes(searchTerm) ||
-        user.UserEmail.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredUsers = users.filter(user =>
+        user.UserName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.UserSurname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.UserDPI?.includes(searchTerm) ||
+        user.UserEmail?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Cálculos para el Resumen Estadístico
@@ -56,7 +58,7 @@ export const UsersView = () => {
                         <h1 className="text-4xl font-black text-emerald-900">Directorio de Clientes</h1>
                         <p className="text-emerald-600 font-medium">Gestiona los accesos, roles y verificaciones de Kinal Bank</p>
                     </div>
-                    <button 
+                    <button
                         onClick={handleAddUser}
                         className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all"
                     >
@@ -76,12 +78,12 @@ export const UsersView = () => {
 
                 {/* Buscador */}
                 <div className="mb-6">
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Buscar por nombre, DPI o correo..." 
-                        className="w-full px-6 py-4 rounded-2xl border-2 border-gray-50 focus:border-emerald-500 focus:bg-white bg-gray-50/50 outline-none transition-all shadow-inner" 
+                        placeholder="Buscar por nombre, DPI o correo..."
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-gray-50 focus:border-emerald-500 focus:bg-white bg-gray-50/50 outline-none transition-all shadow-inner"
                     />
                 </div>
 
@@ -94,11 +96,12 @@ export const UsersView = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredUsers.length > 0 ? (
                             filteredUsers.map((user) => (
-                                <UserCard 
-                                    key={user.uid} 
-                                    user={user} 
+                                <UserCard
+                                    key={user.uid}
+                                    user={user}
                                     onEdit={handleEditUser}
                                     onToggleStatus={() => toggleUserStatus(user.uid)}
+                                    onVerify={() => setUserToVerify(user)}   // ← nuevo
                                 />
                             ))
                         ) : (
@@ -110,11 +113,12 @@ export const UsersView = () => {
                 )}
             </div>
 
-            <UserModal 
-                isOpen={showModal} 
-                onClose={handleCloseModal} 
-                user={selectedUser} 
+            <UserModal
+                isOpen={showModal}
+                onClose={handleCloseModal}
+                user={selectedUser}
             />
+            <UserVerifyModal user={userToVerify} onClose={() => setUserToVerify(null)} />
         </div>
     );
 };
