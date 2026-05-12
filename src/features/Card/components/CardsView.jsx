@@ -73,8 +73,14 @@ export const CardsView = () => {
                                 <DetailRow label="Estado" value={viewDetail.isActive ? 'Activa' : 'Bloqueada'} color={viewDetail.isActive ? 'text-emerald-600' : 'text-red-500'} />
                                 <hr />
                                 <DetailRow label="Cuenta vinculada" value={viewDetail.account?.accountNumber || 'Sin cuenta'} />
-                                <DetailRow label="Titular" value={viewDetail.account?.user?.UserName || '—'} />
-                                <DetailRow label="Saldo" value={`Q ${viewDetail.account?.balance?.toLocaleString() ?? '—'}`} />
+                                <DetailRow
+                                    label="Titular"
+                                    value={
+                                        viewDetail.account?.user
+                                            ? `${viewDetail.account.user.UserName ?? ''} ${viewDetail.account.user.UserSurname ?? ''}`.trim()
+                                            : '—'
+                                    }
+                                />                                <DetailRow label="Saldo" value={`Q ${viewDetail.account?.balance?.toLocaleString() ?? '—'}`} />
                             </div>
                         </div>
                     ) : (

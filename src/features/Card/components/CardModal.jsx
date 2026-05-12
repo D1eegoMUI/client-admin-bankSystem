@@ -68,11 +68,16 @@ export const CardModal = ({ isOpen, onClose, cardData = null }) => {
                             <SearchableSelect
                                 options={accounts.map(a => ({
                                     value: a._id,
-                                    label: `${a.accountNumber} — ${a.user?.UserName ?? ''}`
+                                    label: `${a.accountNumber} — ${a.user?.UserName ?? ''} ${a.user?.UserSurname ?? ''}`.trim()
                                 }))}
                                 value={accountValue}
-                                onChange={val => setValue('account', val)}
-                                placeholder="Buscar número de cuenta..."
+                                onChange={val => {
+                                    setValue('account', val);
+                                    const found = accounts.find(a => a._id === val);
+                                    if (found?.user) {
+                                        setValue('holderName', `${found.user.UserName} ${found.user.UserSurname}`.toUpperCase());
+                                    }
+                                }} placeholder="Buscar número de cuenta..."
                             />
                             {errors.account && <span className="text-red-500 text-[10px] font-bold mt-1 ml-1">Debe seleccionar una cuenta activa</span>}
                         </div>

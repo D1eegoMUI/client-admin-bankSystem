@@ -33,7 +33,8 @@ export const PayCardModal = ({ isOpen, onClose, card }) => {
     };
 
     if (!isOpen || !card) return null;
-
+    console.log('card.user:', card?.user);
+    console.log('accounts[0].user:', accounts[0]?.user);
     return (
         <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex justify-center items-center z-[100] px-3 animate-fadeIn">
             <form
@@ -68,15 +69,36 @@ export const PayCardModal = ({ isOpen, onClose, card }) => {
                         {/* Selector de Cuenta de Origen */}
                         <div className="flex flex-col">
                             <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Cuenta de Origen</label>
-                            <SearchableSelect
-                                options={accounts.map(a => ({
-                                    value: a._id,
-                                    label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
-                                }))}
-                                value={accountValue}
-                                onChange={val => setValue('accountId', val)}
-                                placeholder="Buscar número de cuenta..."
-                            />
+                            {(() => {
+                                const ownerAccounts = accounts.filter(a => {
+                                    const accountUserId = a.user?.uid;
+                                    const cardUserId = card.user?.uid;
+                                    return accountUserId && cardUserId && accountUserId === cardUserId;
+                                });
+                                return (
+                                    <>
+                                        <SearchableSelect
+                                            options={ownerAccounts.map(a => ({
+                                                value: a._id,
+                                                label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                            }))}
+                                            value={accountValue}
+                                            onChange={val => setValue('accountId', val)}
+                                            placeholder="Buscar número de cuenta..."
+                                        />
+                                        {ownerAccounts.length === 0 && (
+                                            <span className="text-amber-500 text-[10px] font-bold mt-1 ml-1">
+                                                El titular no tiene cuentas disponibles para pagar
+                                            </span>
+                                        )}
+                                        {errors.accountId && (
+                                            <span className="text-red-500 text-[10px] font-bold mt-1 ml-1">
+                                                Seleccione una cuenta con fondos
+                                            </span>
+                                        )}
+                                    </>
+                                );
+                            })()}
                             {errors.accountId && <span className="text-red-500 text-[10px] font-bold mt-1 ml-1">Seleccione una cuenta con fondos</span>}
                         </div>
 

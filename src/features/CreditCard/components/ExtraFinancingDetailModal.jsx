@@ -27,7 +27,7 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
             showSuccess("Cuota pagada con éxito");
         } catch (e) {
             console.error("Error al pagar cuota:", e);
-            showError("Error al pagar cuota");
+            showError(e?.response?.data?.message || "Error al pagar cuota");
         } finally {
             setPaying(false);
         }
@@ -88,10 +88,17 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
                         </div>
                         <div className="flex gap-3">
                             <SearchableSelect
-                                options={accounts.map(a => ({
-                                    value: a._id,
-                                    label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
-                                }))}
+                                options={accounts
+                                    .filter(a => {
+                                        const accountUserId = a.user?.uid;
+                                        const financingUserId = financing.user?.uid;
+                                        return accountUserId && financingUserId && accountUserId === financingUserId;
+                                    })
+                                    .map(a => ({
+                                        value: a._id,
+                                        label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                    }))
+                                }
                                 value={selectedAccount}
                                 onChange={val => setSelectedAccount(val)}
                                 placeholder="Buscar número de cuenta..."
@@ -134,8 +141,8 @@ export const ExtraFinancingDetailModal = ({ isOpen, onClose, financing }) => {
                                         </td>
                                         <td className="p-4 text-center">
                                             <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${d.status === 'PAID'
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-amber-100 text-amber-700'
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-amber-100 text-amber-700'
                                                 }`}>
                                                 {d.status === 'PAID' ? '✓ Pagada' : '⧗ Pendiente'}
                                             </span>

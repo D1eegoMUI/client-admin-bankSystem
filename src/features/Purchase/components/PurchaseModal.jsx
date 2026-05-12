@@ -34,7 +34,7 @@ export const PurchaseModal = ({ isOpen, onClose }) => {
             onClose();
         } catch (e) {
             console.error("Error al registrar compra:", e);
-            showError("Error al registrar compra");
+            showError(e?.response?.data?.message || "Error al registrar compra");
         }
     };
 

@@ -275,10 +275,17 @@ export const LoanCard = ({ loan, isAdmin }) => {
                             <div className="flex flex-col">
                                 <label className="text-xs font-black text-gray-400 uppercase mb-2">Cuenta a debitar</label>
                                 <SearchableSelect
-                                    options={accounts.map(a => ({
-                                        value: a._id,
-                                        label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
-                                    }))}
+                                    options={accounts
+                                        .filter(a => {
+                                            const accountUserId = a.user?.uid;
+                                            const loanUserId = loan.borrower?.uid;
+                                            return accountUserId && loanUserId && accountUserId === loanUserId;
+                                        })
+                                        .map(a => ({
+                                            value: a._id,
+                                            label: `${a.accountNumber} — Q${a.balance?.toLocaleString()}`
+                                        }))
+                                    }
                                     value={selectedAccount}
                                     onChange={val => setSelectedAccount(val)}
                                     placeholder="Buscar número de cuenta..."

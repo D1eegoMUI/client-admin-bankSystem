@@ -99,6 +99,20 @@ export const useUserStore = create((set, get) => ({
             throw error;
         }
     },
+
+    changeUserRole: async (id, role) => {
+    set({ loading: true });
+    try {
+        await api.put(`/users/${id}/role`, { UserRol: role });
+        set(state => ({
+            users: state.users.map(u => u._id === id ? { ...u, UserRol: role } : u),
+            loading: false
+        }));
+    } catch (error) {
+        set({ loading: false });
+        throw error;
+    }
+},
 }));
 
 // ================= ACCOUNTS =================
