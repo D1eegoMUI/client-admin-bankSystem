@@ -491,7 +491,7 @@ export const useCardStore = create((set, get) => ({
         try {
             set({ loading: true });
             const res = await api.createCreditCard(data);
-            const newCard = { ...res.data.data, entityType: 'CREDIT' };
+            const newCard = { ...res.data.data, entityType: 'CREDIT' };use
             set({ cards: [newCard, ...get().cards], loading: false });
             return res.data;
         } catch (error) {

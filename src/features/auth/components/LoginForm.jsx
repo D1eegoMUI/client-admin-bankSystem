@@ -21,7 +21,6 @@ const LoginForm = ({ onForgot }) => {
         const res = await login(data);
         if (res.success) {
             navigate("/dashboard");
-            showSuccess("¡Bienvenido de nuevo!");
         }
     };
 

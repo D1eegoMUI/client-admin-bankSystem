@@ -15,10 +15,8 @@ export const CardPurchasesModal = ({ isOpen, onClose, card }) => {
 
     return (
         <div className="fixed inset-0 bg-orange-950/40 backdrop-blur-sm flex justify-center items-center z-[110] px-4 animate-fadeIn">
-            {/* max-w-2xl para un look de estado de cuenta espacioso */}
             <div className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-orange-100 animate-slideDown">
                 
-                {/* Header con Gradiente Naranja/Ámbar */}
                 <div 
                     className="p-7 text-white flex justify-between items-center" 
                     style={{ background: "linear-gradient(90deg, #9a3412 0%, #ea580c 100%)" }}

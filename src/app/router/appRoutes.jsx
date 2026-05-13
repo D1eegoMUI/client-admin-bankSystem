@@ -1,8 +1,9 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardPage } from "../layouts/DashboardPage.jsx";
+import { ProtectedRoute } from "../../shared/utils/ProtectedRoute.jsx"; 
 
-// Vistas de Administración que creamos
+// Vistas de Administración
 import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
 import { CardsView } from "../../features/Card/components/CardsView.jsx";
 import { LoansView } from "../../features/Loan/components/LoansView.jsx";
@@ -14,15 +15,23 @@ import { ExchangeAdminView } from "../../features/exchange/components/ExchangeVi
 import { AccountLookupView } from "../../features/CustomerLookup/AccountLookupView.jsx";
 import { CreditCardView } from "../../features/CreditCard/components/CreditCardView.jsx"; 
 import { PurchaseView } from "../../features/Purchase/components/PurchaseView.jsx";
+
 export const AppRoutes = () => {
     return (
         <Routes>
             {/* RUTA PÚBLICA */}
             <Route path="/" element={<AuthPage />} />
 
-            {/* RUTAS DEL DASHBOARD (ANIDADAS) */}
-            <Route path="/dashboard" element={<DashboardPage />}>
-                {/* Estas sub-rutas se renderizarán en el <Outlet /> de DashboardPage */}
+            {/* RUTAS DEL DASHBOARD PROTEGIDAS */}
+            <Route 
+                path="/dashboard" 
+                element={
+                    <ProtectedRoute>
+                        <DashboardPage />
+                    </ProtectedRoute>
+                }
+            >
+                {/* Estas sub-rutas heredan la protección del padre */}
                 <Route path="account" element={<AccountsView />} />
                 <Route path="card" element={<CardsView />} />
                 <Route path="credit-card" element={<CreditCardView />} /> 
@@ -35,11 +44,10 @@ export const AppRoutes = () => {
                 <Route path="buscador" element={<AccountLookupView />} />
                 <Route path="purchase" element={<PurchaseView />} />
                 
-                {/* Redirección por defecto si entran solo a /dashboard */}
                 <Route index element={<Navigate to="account" />} />
             </Route>
 
-            {/* Ruta para manejar errores 404 (Opcional) */}
+            {/* Manejo de errores 404 */}
             <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
         </Routes>
     );
