@@ -13,18 +13,18 @@ import UsersIcon from "../../../assets/Icons/user.svg";
 import SearchIcon from "../../../assets/Icons/map-pin.svg";
 
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate(); // Inicializamos el hook
+    const navigate = useNavigate();
 
     const handleLogout = () => {
-        navigate("/"); // Redirige a la raíz
+        navigate("/");
     };
 
     const items = [
         { label: "Buscador", icon: SearchIcon, path: "buscador" },
         { label: "Cuenta", icon: AccountIcon, path: "account" },
-        { label: "Tarjetas Débito", icon: CardIcon, path: "card" }, 
+        { label: "Tarjetas Débito", icon: CardIcon, path: "card" },
         { label: "Tarjetas Crédito", icon: CardIcon, path: "credit-card" },
         { label: "Compras", icon: LoanIcon, path: "purchase" },
         { label: "Cambio", icon: ExchangeIcon, path: "exchange" },
@@ -37,9 +37,24 @@ const Sidebar = () => {
 
     return (
         <>
-            <aside className="w-64 bg-white sticky top-16 self-start h-[calc(100vh-4rem)] p-4 flex flex-col justify-between border-r border-gray-100 shadow-sm overflow-y-auto">
+            <aside className={`
+                fixed inset-y-0 left-0 z-50 w-64 bg-white transition-transform duration-300 ease-in-out transform
+                ${isOpen ? "translate-x-0" : "-translate-x-full"}
+                md:relative md:translate-x-0 md:sticky md:top-16 md:self-start
+                h-screen md:h-[calc(100vh-4rem)] p-4 flex flex-col justify-between border-r border-gray-100 shadow-xl md:shadow-sm overflow-y-auto
+            `}>
                 <div>
-                    <div className="mb-4 px-4">
+                    {/* Botón para cerrar el sidebar en móviles */}
+                    <div className="flex items-center justify-between mb-4 md:hidden px-4">
+                        <span className="text-sm font-bold text-emerald-900">Navegación</span>
+                        <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="mb-4 px-4 hidden md:block">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                             Menú Principal
                         </p>
@@ -50,6 +65,8 @@ const Sidebar = () => {
                             <li key={item.label}>
                                 <NavLink
                                     to={`/dashboard/${item.path}`}
+                                    // Al hacer click en móvil, cerramos el sidebar automáticamente
+                                    onClick={() => { if(window.innerWidth < 768) onClose(); }}
                                     className={({ isActive }) => `
                                         group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200
                                         ${isActive
@@ -74,9 +91,8 @@ const Sidebar = () => {
                     </ul>
                 </div>
 
-                {/* SECCIÓN INFERIOR: Soporte + Logout */}
-                <div className="space-y-3">
-                    {/* Caja de Soporte */}
+                {/* SECCIÓN INFERIOR */}
+                <div className="space-y-3 mt-8">
                     <div className="px-4 py-4 bg-gray-50 rounded-2xl border border-gray-100">
                         <p className="text-xs font-semibold text-emerald-900">Soporte Kinal</p>
                         <p className="text-[10px] text-gray-500 mt-1">¿Necesitas ayuda?</p>
@@ -88,7 +104,6 @@ const Sidebar = () => {
                         </button>
                     </div>
 
-                    {/* BOTÓN DE CERRAR SESIÓN */}
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 w-full px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-bold text-sm transition-all group"

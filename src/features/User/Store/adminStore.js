@@ -101,18 +101,18 @@ export const useUserStore = create((set, get) => ({
     },
 
     changeUserRole: async (id, role) => {
-    set({ loading: true });
-    try {
-        await api.put(`/users/${id}/role`, { UserRol: role });
-        set(state => ({
-            users: state.users.map(u => u._id === id ? { ...u, UserRol: role } : u),
-            loading: false
-        }));
-    } catch (error) {
-        set({ loading: false });
-        throw error;
-    }
-},
+        set({ loading: true });
+        try {
+            await api.put(`/users/${id}/role`, { UserRol: role });
+            set(state => ({
+                users: state.users.map(u => u._id === id ? { ...u, UserRol: role } : u),
+                loading: false
+            }));
+        } catch (error) {
+            set({ loading: false });
+            throw error;
+        }
+    },
 }));
 
 // ================= ACCOUNTS =================
@@ -456,9 +456,8 @@ export const useProductStore = create((set, get) => ({
 }));
 
 // ================= CARD STORE =================
-// adminStore.js
 export const useCardStore = create((set, get) => ({
-    cards: [], // Lista unificada para la tabla general
+    cards: [], // Lista unificada débito + crédito
     loading: false,
     error: null,
 
@@ -467,9 +466,10 @@ export const useCardStore = create((set, get) => ({
         try {
             set({ loading: true });
             const res = await api.getCreditCards(params);
-            // Marcamos como CREDIT para el Frontend
-            const cardsWithTag = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
-            set({ cards: cardsWithTag, loading: false });
+            const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
+            // Conserva las DEBIT que ya estén, agrega/reemplaza las CREDIT
+            const debitCards = get().cards.filter(c => c.entityType === 'DEBIT');
+            set({ cards: [...debitCards, ...tagged], loading: false });
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -478,7 +478,7 @@ export const useCardStore = create((set, get) => ({
     saveCreditCard: async (data) => {
         try {
             set({ loading: true });
-            const res = await api.createCreditCard(data); // Endpoint /creditCards
+            const res = await api.createCreditCard(data);
             const newCard = { ...res.data.data, entityType: 'CREDIT' };
             set({ cards: [newCard, ...get().cards], loading: false });
             return res.data;
@@ -488,13 +488,15 @@ export const useCardStore = create((set, get) => ({
         }
     },
 
-    // --- ACCIONES PARA DÉBITO (CARD) ---
+    // --- ACCIONES PARA DÉBITO ---
     getDebitCards: async (params) => {
         try {
             set({ loading: true });
             const res = await api.getCards(params);
-            const cardsWithTag = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
-            set({ cards: cardsWithTag, loading: false });
+            const tagged = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
+            // Conserva las CREDIT que ya estén, agrega/reemplaza las DEBIT
+            const creditCards = get().cards.filter(c => c.entityType === 'CREDIT');
+            set({ cards: [...creditCards, ...tagged], loading: false });
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -503,7 +505,7 @@ export const useCardStore = create((set, get) => ({
     saveDebitCard: async (data) => {
         try {
             set({ loading: true });
-            const res = await api.createCard(data); // Endpoint /cards
+            const res = await api.createCard(data);
             const newCard = { ...res.data.data, entityType: 'DEBIT' };
             set({ cards: [newCard, ...get().cards], loading: false });
             return res.data;
@@ -513,7 +515,7 @@ export const useCardStore = create((set, get) => ({
         }
     },
 
-    // --- ACCIONES COMPARTIDAS (Eliminar/Estado) ---
+    // --- ACCIONES COMPARTIDAS ---
     deleteCard: async (id, type) => {
         try {
             set({ loading: true });
