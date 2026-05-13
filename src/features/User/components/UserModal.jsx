@@ -242,7 +242,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                                     <label className="text-[10px] font-black text-gray-400 uppercase mb-1.5 ml-1 tracking-widest">Rol de Usuario</label>
                                     <select {...register("UserRol")} className="px-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none">
                                         <option value="USER">Rol: Cliente (USER)</option>
-                                        <option value="ADMIN_ROLE">Rol: Administrador (ADMIN)</option>
+                                        <option value="ADMIN">Rol: Administrador (ADMIN)</option>
                                     </select>
                                 </div>
                             </div>

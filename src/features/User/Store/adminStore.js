@@ -468,6 +468,18 @@ export const useCardStore = create((set, get) => ({
             const res = await api.getCreditCards(params);
             const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
             // Conserva las DEBIT que ya estén, agrega/reemplaza las CREDIT
+            set({ cards: [ ...tagged], loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    getBothCards: async (params) => {
+        try {
+            set({ loading: true });
+            const res = await api.getCreditCards(params);
+            const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
+            // Conserva las DEBIT que ya estén, agrega/reemplaza las CREDIT
             const debitCards = get().cards.filter(c => c.entityType === 'DEBIT');
             set({ cards: [...debitCards, ...tagged], loading: false });
         } catch (error) {
