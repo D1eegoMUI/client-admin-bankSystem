@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useProductStore } from '../../User/Store/adminStore';
 import { ProductCard } from './ProductCard';
 import { ProductModal } from './ProductModal';
+import { Search } from 'lucide-react';
 
 const TYPE_OPTIONS = ['TODOS', 'PRODUCTO', 'SERVICIO'];
 
@@ -47,7 +48,7 @@ export const ProductsView = () => {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg shadow-emerald-100 transition-all"
+                    className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg shadow-emerald-100 transition-all"
                 >
                     + Nuevo Item
                 </button>
@@ -56,8 +57,7 @@ export const ProductsView = () => {
             {/* Filtros */}
             <div className="flex flex-col md:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
-                    <input
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />                    <input
                         type="text"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
@@ -70,11 +70,10 @@ export const ProductsView = () => {
                         <button
                             key={opt}
                             onClick={() => setFilterType(opt)}
-                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                                filterType === opt
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
-                            }`}
+                            className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${filterType === opt
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
+                                }`}
                         >
                             {opt}
                         </button>

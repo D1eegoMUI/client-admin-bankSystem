@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useAccountStore } from "../../User/Store/adminStore";
 import { AccountDetailModal } from './AccountDetailModal.jsx';
 import { showSuccess, showError } from '../../../shared/utils/toast.js';
+import { Search } from 'lucide-react';
 
 export const AccountList = ({ onAddClick }) => {
     const { accounts, getAccounts, toggleAccountStatus, loading } = useAccountStore();
@@ -71,8 +72,7 @@ export const AccountList = ({ onAddClick }) => {
             <div className="flex flex-col md:flex-row gap-3 mb-8">
                 {/* Barra de búsqueda */}
                 <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
-                    <input
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />                    <input
                         type="text"
                         placeholder="Buscar por número, usuario o moneda..."
                         value={search}
@@ -88,8 +88,8 @@ export const AccountList = ({ onAddClick }) => {
                             key={opt}
                             onClick={() => setFilterType(opt)}
                             className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${filterType === opt
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
                                 }`}
                         >
                             {opt}
@@ -104,12 +104,12 @@ export const AccountList = ({ onAddClick }) => {
                             key={opt}
                             onClick={() => setFilterStatus(opt)}
                             className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all ${filterStatus === opt
-                                    ? opt === 'ACTIVA'
-                                        ? 'bg-emerald-500 text-white border-emerald-500'
-                                        : opt === 'INACTIVA'
-                                            ? 'bg-red-400 text-white border-red-400'
-                                            : 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
+                                ? opt === 'ACTIVA'
+                                    ? 'bg-emerald-500 text-white border-emerald-500'
+                                    : opt === 'INACTIVA'
+                                        ? 'bg-red-400 text-white border-red-400'
+                                        : 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300'
                                 }`}
                         >
                             {opt}

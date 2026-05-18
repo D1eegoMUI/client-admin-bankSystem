@@ -19,6 +19,9 @@ export const changeUserStatus = async (id) =>
 export const verifyUser = async (id) =>
     await axiosAdmin.put(`/users/${id}/verify`);
 
+export const changeUserRole = async (id, roleName) =>
+    await axiosAdmin.put(`/users/${id}/role`, { UserRol: roleName });
+
 // ================= ACCOUNTS =================
 export const getAccounts = async () => 
     await axiosAdmin.get("/accounts");

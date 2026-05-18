@@ -54,7 +54,6 @@ export const CardsView = () => {
                     ) : filtered.length === 0 ? (
                         <p className="col-span-2 text-center text-gray-400 italic py-10">No se encontraron tarjetas.</p>
                     ) : filtered.map((card) => (
-                        // 👇 Usamos un Fragment para poder insertar el detalle inline en móvil
                         <React.Fragment key={card._id}>
                             <div onClick={() => setViewDetail(viewDetail?._id === card._id ? null : card)} className="cursor-pointer">
                                 <CardItem card={card} />
@@ -116,8 +115,7 @@ export const CardsView = () => {
                 </div>
             </div>
 
-            <CardModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        </div>
+            <CardModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); getDebitCards(); }} />        </div>
     );
 };
 
