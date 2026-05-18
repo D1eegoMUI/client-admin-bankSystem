@@ -48,8 +48,8 @@ export const TransactionsView = () => {
                     <p className="text-emerald-600 font-medium mt-1">Supervisión de toda la red bancaria</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="bg-white p-4 rounded-3xl border border-emerald-100 shadow-sm min-w-[200px]">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                    <div className="bg-white p-4 rounded-3xl border border-emerald-100 shadow-sm">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Volumen filtrado</p>
                         <p className="text-2xl font-black text-emerald-700">
                             Q {totalVolume.toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -60,7 +60,7 @@ export const TransactionsView = () => {
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 transition-all"
+                        className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 transition-all"
                     >
                         <Plus size={16} /> Nueva Transacción
                     </button>
@@ -81,14 +81,14 @@ export const TransactionsView = () => {
                 </div>
 
                 {/* Filtro por tipo */}
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 w-full">
                     {TYPE_OPTIONS.map(opt => (
                         <button
                             key={opt}
                             onClick={() => setFilterType(opt)}
                             className={`px-3 py-2 rounded-xl text-[10px] font-black border transition-all ${filterType === opt
-                                    ? 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-emerald-300'
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-emerald-300'
                                 }`}
                         >
                             {opt}
@@ -97,17 +97,17 @@ export const TransactionsView = () => {
                 </div>
 
                 {/* Filtro por estado */}
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap gap-1.5 w-full">
                     {STATUS_OPTIONS.map(opt => (
                         <button
                             key={opt}
                             onClick={() => setFilterStatus(opt)}
                             className={`px-3 py-2 rounded-xl text-[10px] font-black border transition-all ${filterStatus === opt
-                                    ? opt === 'COMPLETED' ? 'bg-emerald-500 text-white border-emerald-500'
-                                        : opt === 'FAILED' ? 'bg-red-400 text-white border-red-400'
-                                            : opt === 'REVERTED' ? 'bg-yellow-400 text-white border-yellow-400'
-                                                : 'bg-emerald-600 text-white border-emerald-600'
-                                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-emerald-300'
+                                ? opt === 'COMPLETED' ? 'bg-emerald-500 text-white border-emerald-500'
+                                    : opt === 'FAILED' ? 'bg-red-400 text-white border-red-400'
+                                        : opt === 'REVERTED' ? 'bg-yellow-400 text-white border-yellow-400'
+                                            : 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-emerald-300'
                                 }`}
                         >
                             {opt}

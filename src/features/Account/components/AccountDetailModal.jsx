@@ -6,8 +6,8 @@ export const AccountDetailModal = ({ account, onClose }) => {
         : account.user;
 
     return (
-        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex justify-center items-center z-50 px-4">
-            <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-y-auto">
+            <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] my-auto overflow-hidden">
                 <div className="flex items-center justify-between gap-4 p-6 bg-emerald-600 text-white">
                     <div>
                         <h2 className="text-2xl font-bold">Detalle de Cuenta</h2>
@@ -16,7 +16,7 @@ export const AccountDetailModal = ({ account, onClose }) => {
                     <button onClick={onClose} className="text-3xl leading-none hover:text-emerald-200">×</button>
                 </div>
 
-                <div className="p-6 space-y-5">
+                <div className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50">
                             <p className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-2">Número de cuenta</p>

@@ -44,35 +44,56 @@ export const PurchaseView = () => {
                 )}
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-gray-100">
-                            <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Descripción</th>
-                            <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Comercio</th>
-                            <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Tipo</th>
-                            <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Monto</th>
-                            <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Fecha</th>
+            <div className="flex flex-col gap-3 md:hidden">
+                {loading ? (
+                    <p className="text-center p-8 text-gray-400">Cargando...</p>
+                ) : filtered.length === 0 ? (
+                    <p className="text-center p-8 text-gray-400 italic">Sin compras registradas</p>
+                ) : filtered.map(p => (
+                    <div key={p._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col gap-2">
+                        <div className="flex justify-between items-start">
+                            <span className="font-bold text-sm text-gray-800">{p.description}</span>
+                            <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${p.type === 'CREDIT' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                {p.type}
+                            </span>
+                        </div>
+                        <span className="text-xs text-gray-500">{p.merchant}</span>
+                        <div className="flex justify-between items-center mt-1">
+                            <span className="font-black text-violet-600 text-sm">Q {p.amount?.toLocaleString()}</span>
+                            <span className="text-xs text-gray-400">{new Date(p.date).toLocaleDateString('es-GT')}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">                <table className="w-full">
+                <thead>
+                    <tr className="border-b border-gray-100">
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Descripción</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Comercio</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Tipo</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Monto</th>
+                        <th className="text-left p-4 text-[10px] font-black text-gray-400 uppercase">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loading ? (
+                        <tr><td colSpan={5} className="text-center p-8 text-gray-400">Cargando...</td></tr>
+                    ) : filtered.length === 0 ? (
+                        <tr><td colSpan={5} className="text-center p-8 text-gray-400 italic">Sin compras registradas</td></tr>
+                    ) : filtered.map(p => (
+                        <tr key={p._id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                            <td className="p-4 font-bold text-sm text-gray-800">{p.description}</td>
+                            <td className="p-4 text-sm text-gray-500">{p.merchant}</td>
+                            <td className="p-4">
+                                <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${p.type === 'CREDIT' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>{p.type}</span>
+                            </td>
+                            <td className="p-4 font-black text-sm text-violet-600">Q {p.amount?.toLocaleString()}</td>
+                            <td className="p-4 text-sm text-gray-400">{new Date(p.date).toLocaleDateString('es-GT')}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={5} className="text-center p-8 text-gray-400">Cargando...</td></tr>
-                        ) : filtered.length === 0 ? (
-                            <tr><td colSpan={5} className="text-center p-8 text-gray-400 italic">Sin compras registradas</td></tr>
-                        ) : filtered.map(p => (
-                            <tr key={p._id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                                <td className="p-4 font-bold text-sm text-gray-800">{p.description}</td>
-                                <td className="p-4 text-sm text-gray-500">{p.merchant}</td>
-                                <td className="p-4">
-                                    <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${p.type === 'CREDIT' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>{p.type}</span>
-                                </td>
-                                <td className="p-4 font-black text-sm text-violet-600">Q {p.amount?.toLocaleString()}</td>
-                                <td className="p-4 text-sm text-gray-400">{new Date(p.date).toLocaleDateString('es-GT')}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                    ))}
+                </tbody>
+            </table>
             </div>
 
             <PurchaseModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); getPurchases(); }} />

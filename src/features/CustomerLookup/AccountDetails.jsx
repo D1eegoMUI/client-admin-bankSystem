@@ -105,37 +105,25 @@ export const AccountDetail = ({
             {/* PRÉSTAMOS */}
             <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-emerald-100">
                 <h3 className="text-xl font-black text-emerald-900 mb-6">Estado de Préstamos</h3>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="text-xs font-black text-gray-400 uppercase border-b">
-                                <th className="pb-4">Monto</th>
-                                <th className="pb-4">Saldo</th>
-                                <th className="pb-4">Tasa</th>
-                                <th className="pb-4">Plazo</th>
-                                <th className="pb-4">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {safeLoans.length > 0 ? (
-                                safeLoans.map((loan) => (
-                                    <tr key={loan._id} className="border-b">
-                                        <td className="py-4">Q {(Number(loan.amount) || 0).toLocaleString()}</td>
-                                        <td className="py-4 text-red-600">Q {(Number(loan.remainingBalance) || 0).toLocaleString()}</td>
-                                        <td className="py-4">{loan.interestRate}%</td>
-                                        <td className="py-4">{loan.termMonths} Meses</td>
-                                        <td className="py-4 text-blue-600">{loan.status}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="text-center py-6 text-gray-400">
-                                        No tiene préstamos registrados
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                <div className="space-y-3">
+                    {safeLoans.length > 0 ? safeLoans.map((loan) => (
+                        <div key={loan._id} className="p-4 bg-emerald-50 rounded-2xl flex flex-col gap-2">
+                            <div className="flex justify-between items-center">
+                                <span className="font-black text-emerald-900 text-sm">
+                                    Q {(Number(loan.amount) || 0).toLocaleString()}
+                                </span>
+                                <span className="text-[10px] font-black px-2 py-1 rounded-full bg-blue-100 text-blue-700 uppercase">
+                                    {loan.status}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-500">
+                                <span>Saldo: <span className="text-red-600 font-bold">Q {(Number(loan.remainingBalance) || 0).toLocaleString()}</span></span>
+                                <span>{loan.interestRate}% · {loan.termMonths} meses</span>
+                            </div>
+                        </div>
+                    )) : (
+                        <p className="text-gray-400 text-center py-6">No tiene préstamos registrados</p>
+                    )}
                 </div>
             </section>
 
@@ -154,49 +142,31 @@ export const AccountDetail = ({
                 </div>
 
                 {safeTransactions.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="text-[10px] font-black text-gray-400 uppercase border-b">
-                                    <th className="pb-3">Tipo</th>
-                                    <th className="pb-3">Monto</th>
-                                    <th className="pb-3">Origen</th>
-                                    <th className="pb-3">Destino</th>
-                                    <th className="pb-3">Estado</th>
-                                    <th className="pb-3">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {safeTransactions.map((tx) => (
-                                    <tr key={tx._id} className="border-b hover:bg-gray-50 transition-colors">
-                                        <td className="py-3">
-                                            <span className={`text-[10px] font-black px-2 py-1 rounded-full ${typeBadge(tx.type)}`}>
-                                                {tx.type}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 font-black text-sm">
-                                            Q {(Number(tx.amountInGTQ) || 0).toLocaleString()}
-                                        </td>
-                                        <td className="py-3 text-xs text-gray-500">
-                                            {tx.originAccount?.accountNumber || '—'}
-                                        </td>
-                                        <td className="py-3 text-xs text-gray-500">
-                                            {tx.destinationAccount?.accountNumber || '—'}
-                                        </td>
-                                        <td className="py-3">
-                                            <span className={`text-[10px] font-black px-2 py-1 rounded-full ${statusBadge(tx.status)}`}>
-                                                {tx.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 text-xs text-gray-400">
-                                            {tx.createdAt
-                                                ? new Date(tx.createdAt).toLocaleDateString('es-GT')
-                                                : '—'}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="space-y-3">
+                        {safeTransactions.map((tx) => (
+                            <div key={tx._id} className="p-4 bg-gray-50 rounded-2xl flex flex-col gap-2">
+                                <div className="flex justify-between items-center">
+                                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${typeBadge(tx.type)}`}>
+                                        {tx.type}
+                                    </span>
+                                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${statusBadge(tx.status)}`}>
+                                        {tx.status}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="font-black text-sm text-gray-800">
+                                        Q {(Number(tx.amountInGTQ) || 0).toLocaleString()}
+                                    </span>
+                                    <span className="text-xs text-gray-400">
+                                        {tx.createdAt ? new Date(tx.createdAt).toLocaleDateString('es-GT') : '—'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-xs text-gray-400">
+                                    <span>Origen: {tx.originAccount?.accountNumber || '—'}</span>
+                                    <span>Destino: {tx.destinationAccount?.accountNumber || '—'}</span>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <p className="text-gray-400 text-center py-6">No tiene transacciones registradas</p>
@@ -218,43 +188,32 @@ export const AccountDetail = ({
                 </div>
 
                 {safePurchases.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="text-[10px] font-black text-gray-400 uppercase border-b">
-                                    <th className="pb-3">Comercio</th>
-                                    <th className="pb-3">Monto</th>
-                                    <th className="pb-3">Tarjeta</th>
-                                    <th className="pb-3">Estado</th>
-                                    <th className="pb-3">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {safePurchases.map((p) => (
-                                    <tr key={p._id} className="border-b hover:bg-gray-50 transition-colors">
-                                        <td className="py-3 font-bold text-sm text-gray-800">
-                                            {p.merchant || p.description || '—'}
-                                        </td>
-                                        <td className="py-3 font-black text-sm text-purple-700">
-                                            Q {(Number(p.amount) || 0).toLocaleString()}
-                                        </td>
-                                        <td className="py-3 text-xs text-gray-500">
-                                            •••• {String(p.cardId || '').slice(-4)}
-                                        </td>
-                                        <td className="py-3">
-                                            <span className={`text-[10px] font-black px-2 py-1 rounded-full ${statusBadge(p.status)}`}>
-                                                {p.status || '—'}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 text-xs text-gray-400">
-                                            {p.createdAt
-                                                ? new Date(p.createdAt).toLocaleDateString('es-GT')
-                                                : '—'}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="space-y-3">
+                        {safePurchases.map((p) => (
+                            <div key={p._id} className="p-4 bg-purple-50 rounded-2xl flex flex-col gap-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-sm text-gray-800">
+                                        {p.merchant || p.description || '—'}
+                                    </span>
+                                    {p.status && (
+                                        <span className={`text-[10px] font-black px-2 py-1 rounded-full ${statusBadge(p.status)}`}>
+                                            {p.status}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="font-black text-purple-700 text-sm">
+                                        Q {(Number(p.amount) || 0).toLocaleString()}
+                                    </span>
+                                    <span className="text-xs text-gray-400">
+                                        {p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-GT') : '—'}
+                                    </span>
+                                </div>
+                                <span className="text-xs text-gray-400">
+                                    Tarjeta: •••• {String(p.cardId || '').slice(-4)}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <p className="text-gray-400 text-center py-6">No tiene compras registradas</p>

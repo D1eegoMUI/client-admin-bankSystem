@@ -11,13 +11,16 @@ import ProductIcon from "../../../assets/Icons/package.svg";
 import TransactionIcon from "../../../assets/Icons/transaction.svg";
 import UsersIcon from "../../../assets/Icons/user.svg";
 import SearchIcon from "../../../assets/Icons/map-pin.svg";
+import { useAuthStore } from "../../../features/auth/store/authStore.js";
 
 
 const Sidebar = ({ isOpen, onClose }) => {
+    const logout = useAuthStore((state) => state.logout);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        logout();
         navigate("/");
     };
 

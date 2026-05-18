@@ -93,7 +93,7 @@ export const CustomerProfile = ({ user }) => {
                     </p>
 
                     <p className="text-xl font-black text-emerald-600">
-                        Q {user.UserIncome.toLocaleString()}
+                        Q {user.UserIncome?.toLocaleString() ?? "—"}
                     </p>
 
                 </div>

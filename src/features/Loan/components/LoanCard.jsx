@@ -85,27 +85,29 @@ export const LoanCard = ({ loan, isAdmin }) => {
 
     return (
         <>
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:border-emerald-200 transition-all group relative overflow-hidden">
+            <div className="bg-white rounded-[2.5rem] p-4 sm:p-8 shadow-sm border border-gray-100 hover:border-emerald-200 transition-all group relative overflow-hidden">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                <div className="flex justify-between items-start mb-6 gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors shrink-0">
                             <User size={24} />
                         </div>
-                        <div>
-                            <h3 className="text-emerald-950 font-black text-lg leading-tight">
+                        <div className="min-w-0">
+                            <h3 className="text-emerald-950 font-black text-lg leading-tight truncate">
                                 {loan.borrower?.UserName} {loan.borrower?.UserSurname}
                             </h3>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">
                                 {loan.borrower?.UserEmail}
                             </p>
                         </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-2 shrink-0">
                         <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${statusColors[loan.status]}`}>
                             {loan.status}
                         </span>
-                        <p className="text-[10px] font-mono text-gray-400">ID: {loan._id}</p>
+                        <p className="text-[10px] font-mono text-gray-400 max-w-[80px] truncate">
+                            {loan._id.slice(-8).toUpperCase()}
+                        </p>
                     </div>
                 </div>
 
@@ -173,38 +175,60 @@ export const LoanCard = ({ loan, isAdmin }) => {
                     {showDetails && (
                         <div className="border-t border-gray-100 pt-4">
                             <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">Tabla de Amortización</p>
-                            <div className="overflow-x-auto rounded-2xl border border-gray-100">
-                                <table className="w-full text-[11px]">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left font-black text-gray-400 uppercase">#</th>
-                                            <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Cuota</th>
-                                            <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Capital</th>
-                                            <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Interés</th>
-                                            <th className="px-4 py-3 text-center font-black text-gray-400 uppercase">Estado</th>
+                            {/* MÓVIL: cards */}
+                            <div className="flex flex-col gap-2 md:hidden">
+                                {loadingDetails ? (
+                                    <p className="text-center text-gray-400 text-xs py-4">Cargando...</p>
+                                ) : loanDetails.map(d => (
+                                    <div key={d._id} className={`p-3 rounded-2xl border flex justify-between items-center ${d.status === 'PAID' ? 'bg-emerald-50/40 border-emerald-100' : 'bg-gray-50 border-gray-100'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs font-black text-gray-400">#{d.installmentNumber}</span>
+                                            <div>
+                                                <p className="text-sm font-black text-gray-800">Q{d.amount.toFixed(2)}</p>
+                                                <p className="text-[9px] text-gray-400">Capital Q{d.principal.toFixed(2)} · Int. Q{d.interest.toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                        <span className={`px-2 py-1 rounded-full text-[9px] font-black border ${d.status === 'PAID' ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                                : d.status === 'OVERDUE' ? 'bg-red-100 text-red-700 border-red-200'
+                                                    : 'bg-amber-100 text-amber-700 border-amber-200'
+                                            }`}>
+                                            {d.status}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="hidden md:block overflow-x-auto rounded-2xl border border-gray-100">                                <table className="w-full text-[11px]">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left font-black text-gray-400 uppercase">#</th>
+                                        <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Cuota</th>
+                                        <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Capital</th>
+                                        <th className="px-4 py-3 text-right font-black text-gray-400 uppercase">Interés</th>
+                                        <th className="px-4 py-3 text-center font-black text-gray-400 uppercase">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {loanDetails.map(d => (
+                                        <tr key={d._id} className={d.status === 'PAID' ? 'bg-emerald-50/40' : ''}>
+                                            <td className="px-4 py-3 font-bold text-gray-500">{d.installmentNumber}</td>
+                                            <td className="px-4 py-3 text-right font-black text-gray-800">Q{d.amount.toFixed(2)}</td>
+                                            <td className="px-4 py-3 text-right text-gray-500">Q{d.principal.toFixed(2)}</td>
+                                            <td className="px-4 py-3 text-right text-gray-500">Q{d.interest.toFixed(2)}</td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`px-2 py-1 rounded-full text-[9px] font-black border ${d.status === 'PAID'
+                                                    ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                                    : d.status === 'OVERDUE'
+                                                        ? 'bg-red-100 text-red-700 border-red-200'
+                                                        : 'bg-amber-100 text-amber-700 border-amber-200'
+                                                    }`}>
+                                                    {d.status}
+                                                </span>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {loanDetails.map(d => (
-                                            <tr key={d._id} className={d.status === 'PAID' ? 'bg-emerald-50/40' : ''}>
-                                                <td className="px-4 py-3 font-bold text-gray-500">{d.installmentNumber}</td>
-                                                <td className="px-4 py-3 text-right font-black text-gray-800">Q{d.amount.toFixed(2)}</td>
-                                                <td className="px-4 py-3 text-right text-gray-500">Q{d.principal.toFixed(2)}</td>
-                                                <td className="px-4 py-3 text-right text-gray-500">Q{d.interest.toFixed(2)}</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className={`px-2 py-1 rounded-full text-[9px] font-black border ${d.status === 'PAID'
-                                                        ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                                                        : d.status === 'OVERDUE'
-                                                            ? 'bg-red-100 text-red-700 border-red-200'
-                                                            : 'bg-amber-100 text-amber-700 border-amber-200'
-                                                        }`}>
-                                                        {d.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                    ))}
+                                </tbody>
+                            </table>
                             </div>
                         </div>
                     )}

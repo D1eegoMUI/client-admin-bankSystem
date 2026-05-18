@@ -467,8 +467,7 @@ export const useCardStore = create((set, get) => ({
             set({ loading: true });
             const res = await api.getCreditCards(params);
             const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
-            // Conserva las DEBIT que ya estén, agrega/reemplaza las CREDIT
-            set({ cards: [ ...tagged], loading: false });
+            set({ cards: [...tagged], loading: false }); // solo crédito
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -477,11 +476,13 @@ export const useCardStore = create((set, get) => ({
     getBothCards: async (params) => {
         try {
             set({ loading: true });
-            const res = await api.getCreditCards(params);
-            const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
-            // Conserva las DEBIT que ya estén, agrega/reemplaza las CREDIT
-            const debitCards = get().cards.filter(c => c.entityType === 'DEBIT');
-            set({ cards: [...debitCards, ...tagged], loading: false });
+            const [creditRes, debitRes] = await Promise.all([
+                api.getCreditCards(params),
+                api.getCards(params),
+            ]);
+            const creditCards = creditRes.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
+            const debitCards = debitRes.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
+            set({ cards: [...creditCards, ...debitCards], loading: false });
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -491,7 +492,7 @@ export const useCardStore = create((set, get) => ({
         try {
             set({ loading: true });
             const res = await api.createCreditCard(data);
-            const newCard = { ...res.data.data, entityType: 'CREDIT' };use
+            const newCard = { ...res.data.data, entityType: 'CREDIT' };
             set({ cards: [newCard, ...get().cards], loading: false });
             return res.data;
         } catch (error) {
@@ -506,9 +507,7 @@ export const useCardStore = create((set, get) => ({
             set({ loading: true });
             const res = await api.getCards(params);
             const tagged = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
-            // Conserva las CREDIT que ya estén, agrega/reemplaza las DEBIT
-            const creditCards = get().cards.filter(c => c.entityType === 'CREDIT');
-            set({ cards: [...creditCards, ...tagged], loading: false });
+            set({ cards: [...tagged], loading: false }); // solo débito
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }

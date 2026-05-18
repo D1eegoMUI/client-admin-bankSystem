@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { useCardStore } from "../../User/Store/adminStore";
 import { CardItem } from "./CardItem";
 import { CardModal } from "./CardModal";
 import { SearchableSelect } from "../../../shared/components/ui/SearchableSelect";
+import React, { useState, useEffect } from "react";
 
 export const CardsView = () => {
     const { cards, getDebitCards, loading } = useCardStore();
@@ -47,19 +47,44 @@ export const CardsView = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {loading ? (
                         <p className="col-span-2 text-center text-gray-400 py-10">Cargando...</p>
                     ) : filtered.length === 0 ? (
                         <p className="col-span-2 text-center text-gray-400 italic py-10">No se encontraron tarjetas.</p>
                     ) : filtered.map((card) => (
-                        <div key={card._id} onClick={() => setViewDetail(card)} className="cursor-pointer">
-                            <CardItem card={card} />
-                        </div>
+                        // 👇 Usamos un Fragment para poder insertar el detalle inline en móvil
+                        <React.Fragment key={card._id}>
+                            <div onClick={() => setViewDetail(viewDetail?._id === card._id ? null : card)} className="cursor-pointer">
+                                <CardItem card={card} />
+                            </div>
+
+                            {/* MÓVIL: detalle inline justo debajo de la tarjeta seleccionada */}
+                            {viewDetail?._id === card._id && (
+                                <div className="lg:hidden col-span-1 md:col-span-2 bg-white rounded-3xl p-6 border border-emerald-100 shadow-xl animate-fadeIn">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <h2 className="font-black text-gray-800 uppercase italic">Detalles Técnicos</h2>
+                                        <button onClick={() => setViewDetail(null)} className="text-gray-400 text-2xl">×</button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <DetailRow label="ID de Tarjeta" value={viewDetail._id} />
+                                        <DetailRow label="Tipo" value={viewDetail.type} isBadge />
+                                        <DetailRow label="Marca" value={viewDetail.brand} />
+                                        <DetailRow label="Estado" value={viewDetail.isActive ? 'Activa' : 'Bloqueada'} color={viewDetail.isActive ? 'text-emerald-600' : 'text-red-500'} />
+                                        <hr />
+                                        <DetailRow label="Cuenta vinculada" value={viewDetail.account?.accountNumber || 'Sin cuenta'} />
+                                        <DetailRow label="Titular" value={viewDetail.account?.user ? `${viewDetail.account.user.UserName ?? ''} ${viewDetail.account.user.UserSurname ?? ''}`.trim() : '—'} />
+                                        <DetailRow label="Saldo" value={`Q ${viewDetail.account?.balance?.toLocaleString() ?? '—'}`} />
+                                    </div>
+                                </div>
+                            )}
+                        </React.Fragment>
                     ))}
                 </div>
 
-                <div className="lg:col-span-1">
+                {/* DESKTOP: columna lateral — solo visible en lg+ */}
+                <div className="hidden lg:block lg:col-span-1">
                     {viewDetail ? (
                         <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-xl sticky top-6 animate-slideInRight">
                             <div className="flex justify-between items-start mb-6">

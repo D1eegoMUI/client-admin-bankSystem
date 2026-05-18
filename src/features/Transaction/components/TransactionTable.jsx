@@ -35,8 +35,65 @@ export const TransactionTable = ({ transactions, onRevert }) => {
     };
 
     return (
-        <div className="bg-white rounded-[2rem] shadow-sm border border-emerald-100 overflow-hidden">
-            <div className="overflow-x-auto">
+        <>
+            {/* ── MÓVIL: cards ── */}
+            <div className="flex flex-col gap-3 md:hidden">
+                {transactions.map((tx) => (
+                    <div key={tx._id} className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-4 flex flex-col gap-3">
+                        {/* Fila superior: ID + monto */}
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs font-black text-emerald-600 font-mono">{tx._id.slice(-8).toUpperCase()}</p>
+                                <p className="text-[10px] text-gray-400">
+                                    {new Date(tx.createdAt).toLocaleDateString('es-GT')}{' '}
+                                    {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm font-black text-emerald-950">
+                                    {tx.currency} {tx.amount?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </p>
+                                <p className="text-[10px] text-emerald-500/70 font-mono">
+                                    ≈ Q{tx.amountInGTQ?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Tipo + estado */}
+                        <div className="flex gap-2">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-[9px] font-black">
+                                {TYPE_LABELS[tx.type] || tx.type}
+                            </span>
+                            <span className={`px-2 py-1 rounded-full text-[9px] font-black ${STATUS_STYLES[tx.status] || 'bg-gray-100 text-gray-600'}`}>
+                                {tx.status}
+                            </span>
+                        </div>
+
+                        {/* Origen → Destino */}
+                        <div className="flex items-center gap-2 text-xs">
+                            <span className="font-bold text-gray-800">{tx.originAccount?.accountNumber || '—'}</span>
+                            <ArrowRight size={12} className="text-emerald-400 shrink-0" />
+                            <span className="font-bold text-gray-800">{tx.destinationAccount?.accountNumber || '—'}</span>
+                        </div>
+
+                        {/* Descripción */}
+                        {tx.description && (
+                            <p className="text-[10px] text-gray-400 italic">{tx.description}</p>
+                        )}
+
+                        {/* Botón revertir */}
+                        {tx.type === 'DEPOSIT' && tx.status === 'COMPLETED' && (
+                            <button
+                                onClick={() => handleRevert(tx)}
+                                className="flex items-center gap-1 self-end px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-500 text-[10px] font-black hover:bg-yellow-100 transition-colors"
+                            >
+                                <RotateCcw size={12} /> Revertir
+                            </button>
+                        )}
+                    </div>
+                ))}
+            </div>
+            <div className="hidden md:block bg-white rounded-[2rem] shadow-sm border border-emerald-100 overflow-hidden">            <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-emerald-50/50 border-b border-emerald-100">
                         <tr>
@@ -111,6 +168,7 @@ export const TransactionTable = ({ transactions, onRevert }) => {
                     </tbody>
                 </table>
             </div>
-        </div>
+            </div>
+        </>
     );
 };

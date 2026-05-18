@@ -13,17 +13,35 @@ export const CreditCardView = () => {
     const [payModal, setPayModal] = useState({ open: false, card: null });
     const [purchasesModal, setPurchasesModal] = useState({ open: false, card: null });
     const [financingModal, setFinancingModal] = useState({ open: false, card: null });
+    const [selectedUserId, setSelectedUserId] = useState('');
     const [selectedId, setSelectedId] = useState('');
-
     useEffect(() => { getCreditCards(); }, []);
 
-    const cardOptions = cards.map(c => ({
-        value: c._id,
-        label: `${c.account?.user?.UserName ?? ''} ${c.account?.user?.UserSurname ?? ''} — ${c.account?.accountNumber ?? ''} (${c.brand ?? ''})`
-    }));
+    const cardOptions = Array.from(
+        cards.reduce((map, c) => {
+            const user = c.user ?? c.account?.user ?? c.cardHolder;
+            const uid = user?.uid ?? user?._id ?? '';
+            if (uid && !map.has(uid)) {
+                const name = `${user.UserName ?? ''} ${user.UserSurname ?? ''}`.trim();
+                map.set(uid, { value: c._id, label: name, userId: uid });
+            }
+            return map;
+        }, new Map()).values()
+    );
 
-    const filtered = selectedId ? cards.filter(c => c._id === selectedId) : cards;
+    const handleSelect = (cardId) => {
+        const option = cardOptions.find(o => o.value === cardId);
+        setSelectedId(cardId);
+        setSelectedUserId(option?.userId ?? '');
+    };
 
+    const filtered = selectedUserId
+        ? cards.filter(c => {
+            const user = c.user ?? c.account?.user;
+            const uid = user?.uid ?? user?._id;
+            return uid === selectedUserId;
+        })
+        : cards;
     return (
         <div className="p-8">
             <div className="flex justify-between items-center mb-6">
@@ -36,12 +54,12 @@ export const CreditCardView = () => {
                     <SearchableSelect
                         options={cardOptions}
                         value={selectedId}
-                        onChange={setSelectedId}
+                        onChange={handleSelect}
                         placeholder="Buscar por titular, cuenta o marca..."
                     />
                 </div>
                 {selectedId && (
-                    <button onClick={() => setSelectedId('')} className="px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-xs hover:border-red-200 hover:text-red-500 transition-colors">
+                    <button onClick={() => { setSelectedId(''); setSelectedUserId(''); }} className="px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-xs hover:border-red-200 hover:text-red-500 transition-colors">
                         Limpiar
                     </button>
                 )}

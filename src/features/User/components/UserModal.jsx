@@ -79,7 +79,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
 
     // Bloquear numeros en campos de texto
     const blockNumbers = (e) => {
-        if (/\d/.test(e.key)) {
+        if (/^\d$/.test(e.key)) {
             e.preventDefault();
         }
     };
@@ -118,7 +118,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                                     <input
                                         {...register("UserName", {
                                             required: "El nombre es obligatorio",
-                                            pattern: { value: /^[a-zA-ZaeiouAEIOUNn\s]+$/, message: "Solo se permiten letras" }
+                                            pattern: { value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, message: "Solo se permiten letras" }
                                         })}
                                         type="text"
                                         placeholder="Nombres"
@@ -132,7 +132,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                                     <input
                                         {...register("UserSurname", {
                                             required: "El apellido es obligatorio",
-                                            pattern: { value: /^[a-zA-ZaeiouAEIOUNn\s]+$/, message: "Solo se permiten letras" }
+                                            pattern: { value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, message: "Solo se permiten letras" }
                                         })}
                                         type="text"
                                         placeholder="Apellidos"
@@ -207,7 +207,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                                     <input
                                         {...register("UserJob", {
                                             required: "La ocupacion es obligatoria",
-                                            pattern: { value: /^[a-zA-ZaeiouAEIOUNn\s]+$/, message: "Solo se permiten letras" }
+                                            pattern: { value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, message: "Solo se permiten letras" }
                                         })}
                                         type="text"
                                         onKeyDown={blockNumbers}

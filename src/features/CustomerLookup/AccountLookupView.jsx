@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 
-import { CardItem } from '../Card/components/CardItem';
+import { CardVisual } from '../Card/components/CardVisual';
 import { CreditCardItem } from '../CreditCard/components/CreditCardItem';
 import { CustomerProfile } from './CustomerProfile';
 import { AccountDetail } from './AccountDetails';
@@ -12,21 +12,20 @@ import {
     useLoanStore,
     useTransactionStore,
     usePurchaseStore,
+    useCardStore,
 } from '../../features/User/Store/adminStore';
-
-import * as api from '../../shared/Api/admin';
 
 export const AccountLookupView = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [result, setResult] = useState(null);
-    const [allCards, setAllCards] = useState([]);
 
     const { users, getUsers } = useUserStore();
     const { accounts, getAccounts } = useAccountStore();
     const { loans, fetchAllLoans } = useLoanStore();
     const { transactions, fetchAllTransactions } = useTransactionStore();
     const { purchases, getPurchases } = usePurchaseStore();
+    const { cards: allCards = [], getBothCards } = useCardStore();
 
     useEffect(() => {
         const loadData = async () => {
@@ -35,16 +34,7 @@ export const AccountLookupView = () => {
             await fetchAllLoans();
             await getPurchases();
             await fetchAllTransactions();
-
-            const [creditRes, debitRes] = await Promise.all([
-                api.getCreditCards(),
-                api.getCards(),
-            ]);
-
-            const creditCards = (creditRes.data?.data || []).map(c => ({ ...c, entityType: 'CREDIT' }));
-            const debitCards = (debitRes.data?.data || []).map(c => ({ ...c, entityType: 'DEBIT' }));
-
-            setAllCards([...creditCards, ...debitCards]);
+            await getBothCards();
         };
         loadData();
     }, []);
@@ -105,7 +95,7 @@ export const AccountLookupView = () => {
             const purchaseCardId = String(p.cardId || '');
             return cardIds.includes(purchaseCardId);
         });
-        
+
         setResult({
             user: foundUser,
             accounts: userAccounts,
@@ -172,7 +162,7 @@ export const AccountLookupView = () => {
                             ) : (
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {debitCards.map(card => (
-                                        <CardItem key={card._id} card={card} />
+                                        <CardVisual key={card._id} data={card} variant="DEBIT" color="bg-emerald-700" />
                                     ))}
                                 </div>
                             )}

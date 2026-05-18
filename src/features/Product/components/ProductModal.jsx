@@ -78,8 +78,8 @@ export const ProductModal = ({ product, onClose }) => {
                                 onChange={handleChange}
                                 className="px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none"
                             >
-                                <option value="PRODUCTO">📦 PRODUCTO</option>
-                                <option value="SERVICIO">🛠️ SERVICIO</option>
+                                <option value="PRODUCTO">PRODUCTO</option>
+                                <option value="SERVICIO">SERVICIO</option>
                             </select>
                         </div>
 
