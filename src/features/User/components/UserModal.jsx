@@ -34,7 +34,7 @@ export const UserModal = ({ isOpen, onClose, user }) => {
             } else {
                 reset({
                     UserName: "", UserSurname: "", UserDPI: "", UserEmail: "",
-                    UserAddress: "", UserPhone: "", UserJob: "", UserIncome: 1000,
+                    UserAddress: "", UserPhone: "", UserJob: "", UserIncome: 100,
                     UserPassword: "", UserRol: "USER"
                 });
             }
@@ -226,11 +226,11 @@ export const UserModal = ({ isOpen, onClose, user }) => {
                                         <input
                                             {...register("UserIncome", {
                                                 required: "Los ingresos son obligatorios",
-                                                min: { value: 1000, message: "El ingreso minimo es Q1,000" },
+                                                min: { value: 100, message: "El ingreso minimo es Q1,000" },
                                                 valueAsNumber: true
                                             })}
                                             type="number"
-                                            min={1000}
+                                            min={100}
                                             className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-gray-100 focus:border-emerald-500 outline-none"
                                             placeholder="Ingresos Mensuales"
                                         />
