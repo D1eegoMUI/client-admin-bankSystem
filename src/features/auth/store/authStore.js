@@ -38,6 +38,7 @@ export const useAuthStore = create(
                     const role = user?.role || user?.userRol || user?.UserRol || responseData.role;
 
                     console.log("Rol detectado:", role); // Para que lo veas en la consola (F12)
+                    console.log(token);
 
                     // 3. VALIDACIÓN FLEXIBLE
                     // Aceptamos ADMIN, ADMIN_ROLE o lo que sea que Milián haya configurado
