@@ -19,6 +19,9 @@ export const changeUserStatus = async (id) =>
 export const verifyUser = async (id) =>
     await axiosAdmin.put(`/users/${id}/verify`);
 
+export const verifyUserInAuth = async (email) =>
+    await axiosAuth.post(`/api/v1/Auth/verify-by-email`, { email });
+
 export const changeUserRole = async (id, roleName) =>
     await axiosAdmin.put(`/users/${id}/role`, { UserRol: roleName });
 
