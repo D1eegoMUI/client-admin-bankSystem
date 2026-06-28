@@ -1,5 +1,5 @@
 import { useAuthStore } from "../store/authStore.js";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { showSuccess } from "../../../shared/utils/toast.js";

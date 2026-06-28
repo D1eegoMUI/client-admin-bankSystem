@@ -183,3 +183,40 @@ export const getExtraFinancingDetails = async (financingId) =>
 
 export const payExtraFinancingInstallment = async (data) =>
     await axiosAdmin.post("/extraFinancingPayments/pay", data);
+// ================= CARD REQUESTS (solicitudes de nueva tarjeta débito) =================
+export const getCardRequests = async (params) =>
+    await axiosAdmin.get('/cardRequests', { params });
+
+export const approveCardRequest = async (id) =>
+    await axiosAdmin.patch(`/cardRequests/${id}/approve`);
+
+export const rejectCardRequest = async (id, data) =>
+    await axiosAdmin.patch(`/cardRequests/${id}/reject`, data);
+
+// ================= CARD STATUS REQUESTS (activación/desactivación) =================
+export const getCardStatusRequests = async (params) =>
+    await axiosAdmin.get('/cardStatusRequests', { params });
+
+export const approveCardStatusRequest = async (id) =>
+    await axiosAdmin.patch(`/cardStatusRequests/${id}/approve`);
+
+export const rejectCardStatusRequest = async (id, data) =>
+    await axiosAdmin.patch(`/cardStatusRequests/${id}/reject`, data);
+// ================= CREDIT CARD REQUESTS (solicitudes de nueva tarjeta crédito) =================
+export const getCreditCardRequests = async (params) =>
+    await axiosAdmin.get('/creditCardRequests', { params });
+
+export const approveCreditCardRequest = async (id, data) =>
+    await axiosAdmin.patch(`/creditCardRequests/${id}/approve`, data);
+
+export const rejectCreditCardRequest = async (id, data) =>
+    await axiosAdmin.patch(`/creditCardRequests/${id}/reject`, data);
+// ================= EXTRA FINANCING REQUESTS (solicitudes del cliente) =================
+export const getExtraFinancingRequests = async (params) =>
+    await axiosAdmin.get('/extraFinancingRequests/admin', { params });
+
+export const approveExtraFinancingRequest = async (id) =>
+    await axiosAdmin.patch(`/extraFinancingRequests/${id}/approve`);
+
+export const rejectExtraFinancingRequest = async (id, data) =>
+    await axiosAdmin.patch(`/extraFinancingRequests/${id}/reject`, data);

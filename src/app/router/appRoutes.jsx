@@ -15,6 +15,7 @@ import { ExchangeAdminView } from "../../features/exchange/components/ExchangeVi
 import { AccountLookupView } from "../../features/CustomerLookup/AccountLookupView.jsx";
 import { CreditCardView } from "../../features/CreditCard/components/CreditCardView.jsx"; 
 import { PurchaseView } from "../../features/Purchase/components/PurchaseView.jsx";
+import { CardRequestsView } from "../../features/Card/components/CardRequestsView.jsx"
 
 export const AppRoutes = () => {
     return (
@@ -35,6 +36,7 @@ export const AppRoutes = () => {
                 <Route path="account" element={<AccountsView />} />
                 <Route path="card" element={<CardsView />} />
                 <Route path="credit-card" element={<CreditCardView />} /> 
+                <Route path="approve-card" element={<CardRequestsView />} />
                 <Route path="loan" element={<LoansView />} />
                 <Route path="loan-application" element={<LoanApplicationsView />} />
                 <Route path="product" element={<ProductsView />} />
@@ -43,6 +45,8 @@ export const AppRoutes = () => {
                 <Route path="exchange" element={<ExchangeAdminView />} />
                 <Route path="buscador" element={<AccountLookupView />} />
                 <Route path="purchase" element={<PurchaseView />} />
+                
+
                 
                 <Route index element={<Navigate to="account" />} />
             </Route>

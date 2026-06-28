@@ -457,17 +457,28 @@ export const useProductStore = create((set, get) => ({
 
 // ================= CARD STORE =================
 export const useCardStore = create((set, get) => ({
-    cards: [], // Lista unificada débito + crédito
+    cards: [],          
+    creditCards: [],    
     loading: false,
     error: null,
 
-    // --- ACCIONES PARA CRÉDITO ---
     getCreditCards: async (params) => {
         try {
             set({ loading: true });
-            const res = await api.getCreditCards(params);
+            const res = await api.getCreditCards({ limit: 100, ...params });
             const tagged = res.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
-            set({ cards: [...tagged], loading: false }); // solo crédito
+            set({ creditCards: tagged, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message, loading: false });
+        }
+    },
+
+    getDebitCards: async (params) => {
+        try {
+            set({ loading: true });
+            const res = await api.getCards({ limit: 100, ...params });
+            const tagged = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
+            set({ cards: tagged, loading: false });
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -476,13 +487,17 @@ export const useCardStore = create((set, get) => ({
     getBothCards: async (params) => {
         try {
             set({ loading: true });
-            const [creditRes, debitRes] = await Promise.all([
-                api.getCreditCards(params),
-                api.getCards(params),
+            const [creditRes, debitRes] = await Promise.allSettled([
+                api.getCreditCards({ limit: 100, ...params }),
+                api.getCards({ limit: 100, ...params }),
             ]);
-            const creditCards = creditRes.data.data.map(c => ({ ...c, entityType: 'CREDIT' }));
-            const debitCards = debitRes.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
-            set({ cards: [...creditCards, ...debitCards], loading: false });
+            const creditCards = creditRes.status === 'fulfilled'
+                ? creditRes.value.data.data.map(c => ({ ...c, entityType: 'CREDIT' }))
+                : [];
+            const debitCards = debitRes.status === 'fulfilled'
+                ? debitRes.value.data.data.map(c => ({ ...c, entityType: 'DEBIT' }))
+                : [];
+            set({ creditCards, cards: debitCards, loading: false });
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
         }
@@ -493,23 +508,11 @@ export const useCardStore = create((set, get) => ({
             set({ loading: true });
             const res = await api.createCreditCard(data);
             const newCard = { ...res.data.data, entityType: 'CREDIT' };
-            set({ cards: [newCard, ...get().cards], loading: false });
+            set({ creditCards: [newCard, ...get().creditCards], loading: false });
             return res.data;
         } catch (error) {
             set({ error: error.response?.data?.message, loading: false });
             throw error;
-        }
-    },
-
-    // --- ACCIONES PARA DÉBITO ---
-    getDebitCards: async (params) => {
-        try {
-            set({ loading: true });
-            const res = await api.getCards(params);
-            const tagged = res.data.data.map(c => ({ ...c, entityType: 'DEBIT' }));
-            set({ cards: [...tagged], loading: false }); // solo débito
-        } catch (error) {
-            set({ error: error.response?.data?.message, loading: false });
         }
     },
 
@@ -526,45 +529,55 @@ export const useCardStore = create((set, get) => ({
         }
     },
 
-    // --- ACCIONES COMPARTIDAS ---
     deleteCard: async (id, type) => {
         try {
             set({ loading: true });
-            type === 'CREDIT' ? await api.deleteCreditCard(id) : await api.deleteCard(id);
-            set({ cards: get().cards.filter(c => (c._id || c.uid) !== id), loading: false });
+            if (type === 'CREDIT') {
+                await api.deleteCreditCard(id);
+                set({ creditCards: get().creditCards.filter(c => c._id !== id), loading: false });
+            } else {
+                await api.deleteCard(id);
+                set({ cards: get().cards.filter(c => c._id !== id), loading: false });
+            }
         } catch (error) {
-            set({ error: "Error al eliminar", loading: false });
+            set({ error: error.response?.data?.message, loading: false });
+            throw error;
         }
-    }
+    },
 }));
 
 // ================= PURCHASE STORE =================
 export const usePurchaseStore = create((set, get) => ({
     purchases: [],
     loading: false,
-    error: null,
 
-    getPurchases: async (cardId = null) => {
+    // cardId    = account._id (débito) o creditCard._id (crédito)
+    // debitCardId = card._id físico (solo para filtrar débito por tarjeta)
+    getPurchases: async (cardId = null, debitCardId = null) => {
+        set({ loading: true });
         try {
-            set({ loading: true });
-            const res = await api.getPurchases(cardId ? { cardId } : {});
+            const params = {};
+            if (cardId)     params.cardId     = cardId;
+            if (debitCardId) params.debitCardId = debitCardId;
+            const res = await api.getPurchases(params);
             set({ purchases: res.data.data, loading: false });
-        } catch (error) {
-            set({ error: error.response?.data?.message, loading: false });
+        } catch (e) {
+            set({ loading: false });
+            throw e;
         }
     },
 
     createPurchase: async (data) => {
+        set({ loading: true });
         try {
-            set({ loading: true });
             const res = await api.createPurchase(data);
             set({ purchases: [res.data.data, ...get().purchases], loading: false });
             return res.data;
-        } catch (error) {
-            set({ error: error.response?.data?.message, loading: false });
-            throw error;
+        } catch (e) {
+            set({ loading: false });
+            throw e;
         }
-    }
+    },
 }));
 
 // ================= CREDIT CARD PAYMENT STORE =================
@@ -705,4 +718,181 @@ export const useTransactionStore = create((set, get) => ({
             throw error;
         }
     }
+}));
+// ================= CARD REQUESTS STORE =================
+export const useCardRequestStore = create((set, get) => ({
+    requests: [],
+    loading: false,
+    processing: false,
+
+    fetchCardRequests: async (params) => {
+        set({ loading: true });
+        try {
+            const res = await api.getCardRequests(params);
+            set({ requests: res.data.data || [] });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    approveCardRequest: async (id) => {
+        set({ processing: true });
+        try {
+            await api.approveCardRequest(id);
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'APPROVED' } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+
+    rejectCardRequest: async (id, rejectionReason) => {
+        set({ processing: true });
+        try {
+            await api.rejectCardRequest(id, { rejectionReason });
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'REJECTED', rejectionReason } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+}));
+
+// ================= CARD STATUS REQUESTS STORE =================
+export const useCardStatusRequestStore = create((set, get) => ({
+    requests: [],
+    loading: false,
+    processing: false,
+
+    fetchCardStatusRequests: async (params) => {
+        set({ loading: true });
+        try {
+            const res = await api.getCardStatusRequests(params);
+            set({ requests: res.data.data || [] });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    approveCardStatusRequest: async (id) => {
+        set({ processing: true });
+        try {
+            await api.approveCardStatusRequest(id);
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'APPROVED' } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+
+    rejectCardStatusRequest: async (id, rejectionReason) => {
+        set({ processing: true });
+        try {
+            await api.rejectCardStatusRequest(id, { rejectionReason });
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'REJECTED', rejectionReason } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+}));
+// ================= CREDIT CARD REQUESTS STORE =================
+export const useCreditCardRequestStore = create((set, get) => ({
+    requests: [],
+    loading: false,
+    processing: false,
+
+    fetchCreditCardRequests: async (params) => {
+        set({ loading: true });
+        try {
+            const res = await api.getCreditCardRequests(params);
+            set({ requests: res.data.data || [] });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    approveCreditCardRequest: async (id, approvedCreditLimit) => {
+        set({ processing: true });
+        try {
+            await api.approveCreditCardRequest(id, approvedCreditLimit != null ? { approvedCreditLimit } : {});
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'APPROVED' } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+
+    rejectCreditCardRequest: async (id, rejectionReason) => {
+        set({ processing: true });
+        try {
+            await api.rejectCreditCardRequest(id, { rejectionReason });
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'REJECTED', rejectionReason } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+}));
+// ================= EXTRA FINANCING REQUESTS STORE =================
+export const useExtraFinancingRequestStore = create((set, get) => ({
+    requests: [],
+    loading: false,
+    processing: false,
+
+    fetchExtraFinancingRequests: async (params) => {
+        set({ loading: true });
+        try {
+            const res = await api.getExtraFinancingRequests(params);
+            set({ requests: res.data.data || [] });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    approveRequest: async (id) => {
+        set({ processing: true });
+        try {
+            await api.approveExtraFinancingRequest(id);
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'APPROVED' } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+
+    rejectRequest: async (id, rejectionReason) => {
+        set({ processing: true });
+        try {
+            await api.rejectExtraFinancingRequest(id, { rejectionReason });
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, status: 'REJECTED', rejectionReason } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
 }));

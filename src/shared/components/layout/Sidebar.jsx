@@ -29,6 +29,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { label: "Cuenta", icon: AccountIcon, path: "account" },
         { label: "Tarjetas Débito", icon: CardIcon, path: "card" },
         { label: "Tarjetas Crédito", icon: CardIcon, path: "credit-card" },
+        { label: "Aprobación Tarjetas", icon: CardIcon, path: "approve-card" },
         { label: "Compras", icon: LoanIcon, path: "purchase" },
         { label: "Cambio", icon: ExchangeIcon, path: "exchange" },
         { label: "Préstamo", icon: LoanIcon, path: "loan" },
