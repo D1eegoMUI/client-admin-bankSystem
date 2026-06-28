@@ -18,9 +18,6 @@ export const CardItem = ({ card }) => {
                     </div>
                     <p className="text-xl font-black text-emerald-600 italic">Q {card.account?.balance?.toLocaleString() || '0.00'}</p>
                 </div>
-                <button className="w-full mt-4 py-2.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all active:scale-95">
-                    Detalles de Cuenta
-                </button>
             </div>
         </div>
     );
