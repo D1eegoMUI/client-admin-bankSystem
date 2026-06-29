@@ -1,7 +1,7 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardPage } from "../layouts/DashboardPage.jsx";
-import { ProtectedRoute } from "../../shared/utils/ProtectedRoute.jsx"; 
+import { ProtectedRoute } from "../../shared/utils/ProtectedRoute.jsx";
 
 // Vistas de Administración
 import { AccountsView } from "../../features/Account/components/AccountsView.jsx";
@@ -13,9 +13,10 @@ import { TransactionsView } from "../../features/Transaction/components/Transact
 import { UsersView } from "../../features/User/components/UserView.jsx";
 import { ExchangeAdminView } from "../../features/exchange/components/ExchangeView.jsx";
 import { AccountLookupView } from "../../features/CustomerLookup/AccountLookupView.jsx";
-import { CreditCardView } from "../../features/CreditCard/components/CreditCardView.jsx"; 
+import { CreditCardView } from "../../features/CreditCard/components/CreditCardView.jsx";
 import { PurchaseView } from "../../features/Purchase/components/PurchaseView.jsx";
 import { CardRequestsView } from "../../features/Card/components/CardRequestsView.jsx"
+import { AccountRequestsView } from "../../features/Account/components/AccountRequestsView.jsx";
 
 export const AppRoutes = () => {
     return (
@@ -24,8 +25,8 @@ export const AppRoutes = () => {
             <Route path="/" element={<AuthPage />} />
 
             {/* RUTAS DEL DASHBOARD PROTEGIDAS */}
-            <Route 
-                path="/dashboard" 
+            <Route
+                path="/dashboard"
                 element={
                     <ProtectedRoute>
                         <DashboardPage />
@@ -35,8 +36,9 @@ export const AppRoutes = () => {
                 {/* Estas sub-rutas heredan la protección del padre */}
                 <Route path="account" element={<AccountsView />} />
                 <Route path="card" element={<CardsView />} />
-                <Route path="credit-card" element={<CreditCardView />} /> 
+                <Route path="credit-card" element={<CreditCardView />} />
                 <Route path="approve-card" element={<CardRequestsView />} />
+                <Route path="approve-account" element={<AccountRequestsView />} /> 
                 <Route path="loan" element={<LoansView />} />
                 <Route path="loan-application" element={<LoanApplicationsView />} />
                 <Route path="product" element={<ProductsView />} />
@@ -45,9 +47,9 @@ export const AppRoutes = () => {
                 <Route path="exchange" element={<ExchangeAdminView />} />
                 <Route path="buscador" element={<AccountLookupView />} />
                 <Route path="purchase" element={<PurchaseView />} />
-                
 
-                
+
+
                 <Route index element={<Navigate to="account" />} />
             </Route>
 

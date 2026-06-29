@@ -204,6 +204,50 @@ export const useAccountStore = create((set, get) => ({
     }
 }));
 
+export const useAccountRequestStore = create((set, get) => ({
+    requests: [],
+    loading: false,
+    processing: false,
+
+    fetchAccountRequests: async (params) => {
+        set({ loading: true });
+        try {
+            const res = await api.getAccountRequests(params);
+            set({ requests: res.data.data || [] });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    approveAccountRequest: async (id) => {
+        set({ processing: true });
+        try {
+            await api.approveAccountRequest(id);
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, requestStatus: 'APPROVED' } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+
+    rejectAccountRequest: async (id, rejectionReason) => {
+        set({ processing: true });
+        try {
+            await api.rejectAccountRequest(id, { reason: rejectionReason });
+            set({
+                requests: get().requests.map((r) =>
+                    r._id === id ? { ...r, requestStatus: 'REJECTED', rejectionReason } : r
+                ),
+            });
+        } finally {
+            set({ processing: false });
+        }
+    },
+}));
+
 // ================= LOAN STORE =================
 export const useLoanStore = create((set, get) => ({
     loans: [],
@@ -457,8 +501,8 @@ export const useProductStore = create((set, get) => ({
 
 // ================= CARD STORE =================
 export const useCardStore = create((set, get) => ({
-    cards: [],          
-    creditCards: [],    
+    cards: [],
+    creditCards: [],
     loading: false,
     error: null,
 
@@ -557,7 +601,7 @@ export const usePurchaseStore = create((set, get) => ({
         set({ loading: true });
         try {
             const params = {};
-            if (cardId)     params.cardId     = cardId;
+            if (cardId) params.cardId = cardId;
             if (debitCardId) params.debitCardId = debitCardId;
             const res = await api.getPurchases(params);
             set({ purchases: res.data.data, loading: false });

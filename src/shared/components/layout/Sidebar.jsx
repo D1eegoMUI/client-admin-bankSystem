@@ -27,6 +27,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     const items = [
         { label: "Buscador", icon: SearchIcon, path: "buscador" },
         { label: "Cuenta", icon: AccountIcon, path: "account" },
+        { label: "Aprobación Cuentas", icon: AccountIcon, path: "approve-account" },
         { label: "Tarjetas Débito", icon: CardIcon, path: "card" },
         { label: "Tarjetas Crédito", icon: CardIcon, path: "credit-card" },
         { label: "Aprobación Tarjetas", icon: CardIcon, path: "approve-card" },

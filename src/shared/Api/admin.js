@@ -41,6 +41,14 @@ export const getAccountRanking = async (params) =>
 export const getAccountDetails = async (id) => 
     await axiosAdmin.get(`/accounts/${id}/details`);
 
+export const getAccountRequests = async (params) =>
+    await axiosAdmin.get("/accounts/requests", { params });
+
+export const approveAccountRequest = async (id) =>
+    await axiosAdmin.patch(`/accounts/${id}/approve`);
+
+export const rejectAccountRequest = async (id, data) =>
+    await axiosAdmin.patch(`/accounts/${id}/reject`, data);
 // ================= LOAN =================
 export const getAllLoans = async () => 
     await axiosAdmin.get("/loans"); // Solo ADMIN
